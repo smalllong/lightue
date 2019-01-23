@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  padding: 0 4%;
+}
+
+.week-title-item, .days-item {
+  display: inline-block;
+  text-align: center;
+  width: 14.28%;
+  padding: 4% 0;
+}
+
+.week-title-item {
+  font-size: 2vw;
+}
+
+.days-item {
+  font-size: 3vw;
+}
+
+.months-item > .name {
+  font-size: 4vw;
+  padding: 3% 4%;
+  text-align: right;
+}
+
+.deep-blue {
+  background-color: #26b;
+  color: #fff
+}

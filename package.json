@@ -1,0 +1,15 @@
+{
+  "name": "lightue",
+  "version": "0.0.1",
+  "description": "A light and simple model-view framework inspired by Vue.js",
+  "main": "lightue.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smalllong/lightue.git"
+  },
+  "author": "Xiaolong Li",
+  "license": "MIT"
+}
