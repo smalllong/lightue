@@ -32,7 +32,6 @@ function Lightue(data, op = {}) {
       }
 
     this.parent = parent
-    this.el = document.createElement(ndata.$tag || 'div')
     this.ndata = ndata
     ndata.$node = this
     this.key = key
@@ -43,6 +42,7 @@ function Lightue(data, op = {}) {
   }
 
   Node.prototype.create = function() {
+    this.el = document.createElement(this.ndata.$tag || 'div')
     for (var i in this.ndata) {
       var o = this.ndata[i]
       if (i.startsWith('$')) {  //lightue directives
