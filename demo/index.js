@@ -5,7 +5,7 @@ function select(e) {
     selectStart = e.$argus[0]
     selectEnd = null
   }
-  e.$node.parent.parent.parent.render()
+  vm.root.render()
 }
 
 function createArr(length) {
@@ -16,6 +16,7 @@ function createArr(length) {
   return res
 }
 function dateEquals(d1, d2) {
+  if (d1 == null || d2 == null) return false
   return d1.getTime() == d2.getTime()
 }
 function fillDate(date) {
@@ -26,7 +27,7 @@ function format(d, s) {
   return s.replace('YYYY', d.getFullYear()).replace('MM', this.fillDate(d.getMonth()+1))
 }
 
-var today = new Date(), y = today.getFullYear(), m = today.getMonth(), selectStart = new Date(2019, 2, 4), selectEnd = new Date(2019, 3, 4)
+var today = new Date(), y = today.getFullYear(), m = today.getMonth(), selectStart, selectEnd
 
 var vm = new Lightue({
   weekTitle: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
@@ -37,11 +38,18 @@ var vm = new Lightue({
       days: createArr(month.getDay()).concat(createArr(monthLength).map((e, j) => {
         var d = new Date(y, m+i, j+1)
         return {
-          $class: {get deepBlue() {return dateEquals(d, selectStart) || d > selectStart && selectEnd && d <= selectEnd}},
+          $class: {
+            get deepBlue() {return dateEquals(d, selectStart) || selectEnd && dateEquals(d, selectEnd)},
+            get lightBlue() {return d > selectStart && selectEnd && d < selectEnd}
+          },
           $inner: fillDate(j+1),
-          onclick: new LightueHandler(select, d),
+          onclick: [select, d],
         }
       })),
     }
   }),
+  selectedText: {
+    $class: {get hidden() {return selectEnd == null}},
+    get $inner() {return selectEnd == null ? '' : selectStart.toLocaleDateString() + '~' + selectEnd.toLocaleDateString()},
+  },
 })
