@@ -112,8 +112,6 @@ function Lightue(data, op = {}) {
   this.root.render()
   this.data = data
   if (op.created) op.created()
-  window.addEventListener('DOMContentLoaded', () => {
-    document.querySelector(op.el || 'body').appendChild(this.root.el)
-    if (op.mounted) op.mounted()
-  })
+  document.querySelector(op.el || 'body').appendChild(this.root.el)
+  if (op.mounted) op.mounted()
 }
