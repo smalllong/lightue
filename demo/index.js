@@ -5,7 +5,7 @@ function select(e) {
     selectStart = e.$argus[0]
     selectEnd = null
   }
-  vm.root.render()
+  vm.$render()
 }
 
 function createArr(length) {
@@ -29,7 +29,7 @@ function format(d, s) {
 
 var today = new Date(), y = today.getFullYear(), m = today.getMonth(), selectStart, selectEnd
 
-var vm = new Lightue({
+var vm = Lightue({
   weekTitle: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
   months: createArr(13).map((e, i) => {
     var month = new Date(y, m+i), monthLength = new Date(y, m+i+1, 0).getDate()

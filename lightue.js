@@ -15,33 +15,39 @@ function Lightue(data, op = {}) {
 
   //extend array functions
   function arrayPush(...args) {
+    var originalLength = this.length
     Array.prototype.push.apply(this, args)
     args.forEach((ndata, i) => {
-      var newNode = new Node(ndata, this.$node, hyphenate(this.$node.key)+'-item', this.length + i)
+      var newNode = new Node(this, originalLength + i, this.$node, hyphenate(this.$node.key)+'-item', this.length + i)
       newNode.render()
       this.$node.el.appendChild(newNode.el)
       this.$node.childNodes.push(newNode)
     })
   }
 
-  function Node(ndata, parent = null, key = '', index = 0) {  // VDOM Node
-    //$inner shorthand
-    if (typeof ndata != 'object' || Array.isArray(ndata))
-      ndata = {
-        $inner: ndata
+  //grab ndata from parent to make it newest (avoid value assign)
+  function Node(ndataParent, ndataKey, parentNode = null, key = '', index = -1) {  // VDOM Node
+    var ndata = ndataParent[ndataKey]
+    if (typeof ndata == 'object' && ndata != null) {
+      lightAssign(ndata, '$node', this)
+      lightAssign(ndata, '$render', this.render.bind(this))
+    }
+    Object.defineProperty(this, 'ndata', {
+      get: () => {
+        ndata = ndataParent[ndataKey]
+        //$inner shorthand
+        if (typeof ndata != 'object' || Array.isArray(ndata))
+          ndata = {
+            $inner: ndata
+          }
+        return ndata
       }
-
-    this.parent = parent
-    this.ndata = ndata
-    ndata.$node = this
+    })
+    this.parent = parentNode
     this.key = key
     this.index = index
     this.childNodes = []
     this.classes = new Set()
-    this.create()
-  }
-
-  Node.prototype.create = function() {
     this.el = document.createElement(this.ndata.$tag || 'div')
     for (var i in this.ndata) {
       var o = this.ndata[i]
@@ -49,11 +55,10 @@ function Lightue(data, op = {}) {
         if (i == '$inner') {
           if (Array.isArray(o)) {
             this.childNodes = o.map((cdata, i) => {
-              var newNode = new Node(cdata, this, hyphenate(this.key)+'-item', i)
+              var newNode = new Node(o, i, this, hyphenate(this.key)+'-item', i)
               this.el.appendChild(newNode.el)
               return newNode
             })
-            lightAssign(o, '$node', this)
             lightAssign(o, 'push', arrayPush)
           }
         }
@@ -64,13 +69,14 @@ function Lightue(data, op = {}) {
             var e2 = Object.create(e)
             e2.$data = this.ndata
             e2.$node = this
+            e2.$render = this.render.bind(this)
             e2.$index = this.index
             e2.$argus = o.slice(1)
             o[0](e2)
           })
         })(o)
       } else {
-        var newNode = new Node(o, this, hyphenate(i))
+        var newNode = new Node(this.ndata, i, this, hyphenate(i))
         this.el.appendChild(newNode.el)
         this.childNodes.push(newNode)
       }
@@ -108,10 +114,8 @@ function Lightue(data, op = {}) {
     this.childNodes.forEach(c => c.render())
   }
 
-  this.root = new Node(data, null, 'root')
-  this.root.render()
-  this.data = data
-  if (op.created) op.created()
-  document.querySelector(op.el || 'body').appendChild(this.root.el)
-  if (op.mounted) op.mounted()
+  var root = new Node({data: data}, 'data', null, 'root')
+  root.render()
+  document.querySelector(op.el || 'body').appendChild(root.el)
+  return data
 }
