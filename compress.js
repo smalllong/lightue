@@ -1,11 +1,10 @@
 const compress = require('iltorb').compressSync
 const fs = require('fs')
-const minify = require("babel-minify")
+const terser = require("terser")
 
-const minified = minify(fs.readFileSync('lightue.js'), {
-  removeConsole: true,
-}).code
+const src = fs.readFileSync('lightue.js').toString()
+
+const minified = terser.minify(src).code
 
 fs.writeFileSync('lightue.min.js', minified)
-
 fs.writeFileSync('lightue.min.js.br', compress(Buffer.from(minified)))

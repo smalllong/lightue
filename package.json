@@ -14,10 +14,10 @@
   "author": "Xiaolong Li",
   "license": "MIT",
   "devDependencies": {
-    "babel-minify": "^0.5.0",
-    "iltorb": "^2.4.1"
+    "iltorb": "^2.4.1",
+    "terser": "^4.6.3"
   },
   "browserslist": [
-    "firefox >= 26"
+    "firefox >= 9"
   ]
 }

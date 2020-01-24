@@ -1,4 +1,5 @@
-function Lightue(data, op = {}) {
+function Lightue(data, op) {
+  op = op || {}
   //assign a non-enumerable value
   function lightAssign(obj, key, val) {
     Object.defineProperty(obj, key, {
@@ -14,26 +15,28 @@ function Lightue(data, op = {}) {
   }
 
   //extend array functions
-  function arrayPush(...args) {
+  function arrayPush() {
+    var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments))
     var originalLength = this.length
     Array.prototype.push.apply(this, args)
-    args.forEach((ndata, i) => {
+    for (var i in args) {
+      var ndata = args[i]
       var newNode = new Node(this, originalLength + i, this.$node, hyphenate(this.$node.key)+'-item', this.length + i)
       newNode.render()
       this.$node.el.appendChild(newNode.el)
       this.$node.childNodes.push(newNode)
-    })
+    }
   }
 
   //grab ndata from parent to make it newest (avoid value assign)
-  function Node(ndataParent, ndataKey, parentNode = null, key = '', index = -1) {  // VDOM Node
-    var ndata = ndataParent[ndataKey]
+  function Node(ndataParent, ndataKey, parentNode, key, index) {  // VDOM Node
+    var ndata = ndataParent[ndataKey], theNode = this
     if (typeof ndata == 'object' && ndata != null) {
       lightAssign(ndata, '$node', this)
       lightAssign(ndata, '$render', this.render.bind(this))
     }
     Object.defineProperty(this, 'ndata', {
-      get: () => {
+      get: function() {
         ndata = ndataParent[ndataKey]
         //$inner shorthand
         if (typeof ndata != 'object' || Array.isArray(ndata))
@@ -44,19 +47,19 @@ function Lightue(data, op = {}) {
       }
     })
     this.parent = parentNode
-    this.key = key
-    this.index = index
+    this.key = key || ''
+    this.index = index || -1
     this.childNodes = []
-    this.classes = new Set()
+    this.classes = []
     this.el = document.createElement(this.ndata.$tag || 'div')
     for (var i in this.ndata) {
       var o = this.ndata[i]
       if (i.startsWith('$')) {  //lightue directives
         if (i == '$inner') {
           if (Array.isArray(o)) {
-            this.childNodes = o.map((cdata, i) => {
-              var newNode = new Node(o, i, this, hyphenate(this.key)+'-item', i)
-              this.el.appendChild(newNode.el)
+            this.childNodes = o.map(function(cdata, i) {
+              var newNode = new Node(o, i, theNode, hyphenate(theNode.key)+'-item', i)
+              theNode.el.appendChild(newNode.el)
               return newNode
             })
             lightAssign(o, 'push', arrayPush)
@@ -64,13 +67,13 @@ function Lightue(data, op = {}) {
         }
       } else if (i.startsWith('_')) {
       } else if (i.startsWith('on')) {
-        (o => {
-          this.el.addEventListener(i.slice(2), e => {
+        (function(o) {
+          theNode.el.addEventListener(i.slice(2), function(e) {
             var e2 = Object.create(e)
-            e2.$data = this.ndata
-            e2.$node = this
-            e2.$render = this.render.bind(this)
-            e2.$index = this.index
+            e2.$data = theNode.ndata
+            e2.$node = theNode
+            e2.$render = theNode.render.bind(theNode)
+            e2.$index = theNode.index
             e2.$argus = o.slice(1)
             o[0](e2)
           })
@@ -85,7 +88,7 @@ function Lightue(data, op = {}) {
 
   Node.prototype.render = function() {
     this.el.className = ''
-    this.classes.clear()
+    this.classes = []
     for (var i in this.ndata) {
       var o = this.ndata[i]
       if (i.startsWith('$')) {  //lightue directives
@@ -94,12 +97,10 @@ function Lightue(data, op = {}) {
             this.el.textContent = o
         } else if (i == '$class') {
           if (Array.isArray(o)) {
-            this.classes = new Set(o)
-          } else if (o instanceof Set) {
             this.classes = o
           } else {
             for (var j in o) {
-              if (o[j]) this.classes.add(hyphenate(j))
+              if (o[j]) this.classes.push(hyphenate(j))
             }
           }
         }
@@ -108,10 +109,10 @@ function Lightue(data, op = {}) {
       }
     }
     if (this.key)
-      this.classes.add(this.key)
-    this.classes.forEach(c => this.el.classList.add(c))
+      this.classes.push(this.key)
+    for (var i in this.classes) this.el.classList.add(this.classes[i])
     
-    this.childNodes.forEach(c => c.render())
+    for (var i in this.childNodes) this.childNodes[i].render()
   }
 
   var root = new Node({data: data}, 'data', null, 'root')
