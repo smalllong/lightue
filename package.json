@@ -14,7 +14,6 @@
   "author": "Xiaolong Li",
   "license": "MIT",
   "devDependencies": {
-    "iltorb": "^2.4.1",
     "terser": "^4.6.3"
   },
   "browserslist": [

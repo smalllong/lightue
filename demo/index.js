@@ -31,11 +31,11 @@ var today = new Date(), y = today.getFullYear(), m = today.getMonth(), selectSta
 
 var vm = Lightue({
   weekTitle: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
-  months: createArr(13).map((e, i) => {
+  months: createArr(13).map(function(e, i) {
     var month = new Date(y, m+i), monthLength = new Date(y, m+i+1, 0).getDate()
     return {
       name: format(month, 'YYYY年MM月'),
-      days: createArr(month.getDay()).concat(createArr(monthLength).map((e, j) => {
+      days: createArr(month.getDay()).concat(createArr(monthLength).map(function(e, j) {
         var d = new Date(y, m+i, j+1)
         return {
           $class: {

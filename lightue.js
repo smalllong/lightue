@@ -54,7 +54,7 @@ function Lightue(data, op) {
     this.el = document.createElement(this.ndata.$tag || 'div')
     for (var i in this.ndata) {
       var o = this.ndata[i]
-      if (i.startsWith('$')) {  //lightue directives
+      if (i[0] == '$') {  //lightue directives
         if (i == '$inner') {
           if (Array.isArray(o)) {
             this.childNodes = o.map(function(cdata, i) {
@@ -65,8 +65,8 @@ function Lightue(data, op) {
             lightAssign(o, 'push', arrayPush)
           }
         }
-      } else if (i.startsWith('_')) {
-      } else if (i.startsWith('on')) {
+      } else if (i[0] == '_') {
+      } else if (i.slice(0, 2) == 'on') {
         (function(o) {
           theNode.el.addEventListener(i.slice(2), function(e) {
             var e2 = Object.create(e)
@@ -91,7 +91,7 @@ function Lightue(data, op) {
     this.classes = []
     for (var i in this.ndata) {
       var o = this.ndata[i]
-      if (i.startsWith('$')) {  //lightue directives
+      if (i[0] == '$') {  //lightue directives
         if (i == '$inner') {
           if (typeof o == 'string')
             this.el.textContent = o
@@ -104,7 +104,7 @@ function Lightue(data, op) {
             }
           }
         }
-      } else if (i.startsWith('_')) {
+      } else if (i[0] == '_') {
         this.el.setAttribute(hyphenate(i.slice(1)), o)
       }
     }
