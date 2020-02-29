@@ -30,7 +30,7 @@ function format(d, s) {
 var today = new Date(), y = today.getFullYear(), m = today.getMonth(), selectStart, selectEnd
 
 var vm = Lightue({
-  weekTitle: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+  weekTitle: [{$$: '周', $_end: '日'}, '周一', '周二', '周三', '周四', '周五', {$$: '周', $_end: '六'}],
   months: createArr(13).map(function(e, i) {
     var month = new Date(y, m+i), monthLength = new Date(y, m+i+1, 0).getDate()
     return {
@@ -42,7 +42,7 @@ var vm = Lightue({
             get deepBlue() {return dateEquals(d, selectStart) || selectEnd && dateEquals(d, selectEnd)},
             get lightBlue() {return d > selectStart && selectEnd && d < selectEnd}
           },
-          $inner: fillDate(j+1),
+          $$: fillDate(j+1),
           onclick: [select, d],
         }
       })),
@@ -50,6 +50,6 @@ var vm = Lightue({
   }),
   selectedText: {
     $class: {get hidden() {return selectEnd == null}},
-    get $inner() {return selectEnd == null ? '' : selectStart.toLocaleDateString() + '~' + selectEnd.toLocaleDateString()},
+    get $$() {return selectEnd == null ? '' : selectStart.toLocaleDateString() + '~' + selectEnd.toLocaleDateString()},
   },
 })

@@ -20,7 +20,6 @@ function Lightue(data, op) {
     var originalLength = this.length
     Array.prototype.push.apply(this, args)
     for (var i in args) {
-      var ndata = args[i]
       var newNode = new Node(this, originalLength + i, this.$node, hyphenate(this.$node.key)+'-item', this.length + i)
       newNode.render()
       this.$node.el.appendChild(newNode.el)
@@ -38,10 +37,10 @@ function Lightue(data, op) {
     Object.defineProperty(this, 'ndata', {
       get: function() {
         ndata = ndataParent[ndataKey]
-        //$inner shorthand
+        //$$ shorthand
         if (typeof ndata != 'object' || Array.isArray(ndata))
           ndata = {
-            $inner: ndata
+            $$: ndata,
           }
         return ndata
       }
@@ -51,19 +50,27 @@ function Lightue(data, op) {
     this.index = index || -1
     this.childNodes = []
     this.classes = []
-    this.el = document.createElement(this.ndata.$tag || 'div')
+    this.el = document.createElement(this.ndata.$tag || (ndataKey.slice(0, 2) == '$_'?'span':'div'))
+    this.texts = {}
     for (var i in this.ndata) {
       var o = this.ndata[i]
       if (i[0] == '$') {  //lightue directives
-        if (i == '$inner') {
-          if (Array.isArray(o)) {
+        if (i.slice(0, 2) == '$$') { //array or textNode
+          if (i == '$$' && Array.isArray(o)) {
             this.childNodes = o.map(function(cdata, i) {
-              var newNode = new Node(o, i, theNode, hyphenate(theNode.key)+'-item', i)
+              var newNode = new Node(o, String(i), theNode, hyphenate(theNode.key)+'-item', i)
               theNode.el.appendChild(newNode.el)
               return newNode
             })
             lightAssign(o, 'push', arrayPush)
+          } else if (typeof o == 'string') {
+            this.texts[i] = document.createTextNode(o)
+            this.el.appendChild(this.texts[i])
           }
+        } else if (i.slice(0, 2) == '$_') { //span element shortcut
+          var newNode = new Node(this.ndata, i, this, hyphenate(i.slice(2)))
+          this.el.appendChild(newNode.el)
+          this.childNodes.push(newNode)
         }
       } else if (i[0] == '_') {
       } else if (i.slice(0, 2) == 'on') {
@@ -87,14 +94,15 @@ function Lightue(data, op) {
   }
 
   Node.prototype.render = function() {
-    this.el.className = ''
+    if (this.el.className != '')
+      this.el.className = ''
     this.classes = []
     for (var i in this.ndata) {
       var o = this.ndata[i]
       if (i[0] == '$') {  //lightue directives
-        if (i == '$inner') {
+        if (i.slice(0, 2) == '$$') {
           if (typeof o == 'string')
-            this.el.textContent = o
+            this.texts[i].textContent = o
         } else if (i == '$class') {
           if (Array.isArray(o)) {
             this.classes = o
