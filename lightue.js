@@ -63,7 +63,7 @@ function Lightue(data, op) {
               return newNode
             })
             lightAssign(o, 'push', arrayPush)
-          } else if (typeof o == 'string') {
+          } else if (typeof o == 'string' || typeof o == 'number') {
             this.texts[i] = document.createTextNode(o)
             this.el.appendChild(this.texts[i])
           }
@@ -76,13 +76,7 @@ function Lightue(data, op) {
       } else if (i.slice(0, 2) == 'on') {
         (function(o) {
           theNode.el.addEventListener(i.slice(2), function(e) {
-            var e2 = Object.create(e)
-            e2.$data = theNode.ndata
-            e2.$node = theNode
-            e2.$render = theNode.render.bind(theNode)
-            e2.$index = theNode.index
-            e2.$argus = o.slice(1)
-            o[0](e2)
+            o[0].apply(theNode.ndata, [e].concat(o.slice(1)))
           })
         })(o)
       } else {
@@ -101,7 +95,7 @@ function Lightue(data, op) {
       var o = this.ndata[i]
       if (i[0] == '$') {  //lightue directives
         if (i.slice(0, 2) == '$$') {
-          if (typeof o == 'string')
+          if (typeof o == 'string' || typeof o == 'number')
             this.texts[i].textContent = o
         } else if (i == '$class') {
           if (Array.isArray(o)) {
@@ -127,4 +121,12 @@ function Lightue(data, op) {
   root.render()
   document.querySelector(op.el || 'body').appendChild(root.el)
   return data
+}
+
+//methods
+Lightue.for = function(count, generateItem) {
+  var arr = []
+  for (var i = 0; i < count; i++)
+    arr.push(generateItem?generateItem(i):'')
+  return arr
 }

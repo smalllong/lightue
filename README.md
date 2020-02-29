@@ -2,11 +2,11 @@
 
 A lightweight and simple model-view framework inspired by Vue.js
 
-only 0.72KB min+br (compared with vue.js 35.396 KB)
+only 0.85KB min+br (compared with vue.js 30.06 KB)
 
 ## How to use:
 
 ```html
-<script defer src='https://unpkg.com/lightue@0.0.1/lightue.min.js'></script>
-<script defer src='your_script.js'></script>
+<script src='https://unpkg.com/lightue@0.0.1/lightue.min.js'></script>
+<script src='your_script.js'></script>
 ```
