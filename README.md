@@ -2,7 +2,7 @@
 
 A lightweight and simple model-view framework inspired by Vue.js
 
-only 0.85KB min+br (compared with vue.js 30.06 KB)
+only 0.95KB min+br (compared with vue.js 30.06 KB)
 
 ## How to use:
 
