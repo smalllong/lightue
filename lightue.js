@@ -16,95 +16,107 @@ function Lightue(data, op) {
 
   //extend array functions
   function arrayPush() {
-    var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments))
     var originalLength = this.length
-    Array.prototype.push.apply(this, args)
-    for (var i in args) {
-      var newNode = new Node(this, originalLength + i, this.$node, hyphenate(this.$node.key)+'-item', this.length + i)
-      newNode.render()
-      this.$node.el.appendChild(newNode.el)
-      this.$node.childNodes.push(newNode)
+    Array.prototype.push.apply(this, arguments)
+    for (var i=0; i<arguments.length; i++) {
+      var newNode = new Node(this, originalLength + i, this.$node, hyphenate(this.$node.key)+'-item')
+      this.$node._addChild(newNode)
     }
   }
 
+  //make a reactive shortcut to DOM API
+  // op.get/op.set: custom methods when the getting and setting of the value in DOM is not directly assign
+  function mapDom(obj, key, el, elKey, enumerable, op) {
+    op = op || {}
+    op.get = op.get || function(el, elKey) {return el[elKey]}
+    op.set = op.set || function(el, elKey, v) {el[elKey] = v}
+    var property = Object.getOwnPropertyDescriptor(obj, key);
+    var setter = property && property.set;
+    var set = function(v) {
+      if (op.convert) v = op.convert(v)
+      if (v == op.get(el, elKey)) return
+      setter && setter.call(this, v)
+      op.set(el, elKey, v)
+    }
+    if (property && property.get) {
+      Lightue._dep = {
+        notify: function() {
+          var v = obj[key]
+          if (op.convert) v = op.convert(v)
+          if (v == op.get(el, elKey)) return
+          op.set(el, elKey, v)
+        }
+      }
+    }
+    set(obj[key])
+    if (property && property.get)
+      Lightue._dep = null
+    Object.defineProperty(obj, key, {
+      get: property && property.get || function() {
+        return op.get(el, elKey)
+      },
+      set: set,
+      enumerable: enumerable || false,
+      configurable: true
+    })
+  }
+
   //grab ndata from parent to make it newest (avoid value assign)
-  function Node(ndataParent, ndataKey, parentNode, key, index) {  // VDOM Node
+  function Node(ndataParent, ndataKey, parentNode, key) {  // VDOM Node
+    ndataKey = String(ndataKey)
     var theNode = this
-    this.ndata = ndataParent[ndataKey]
+    var ndata = this.ndata = ndataParent[ndataKey]
     this.parent = parentNode
     this.key = key || ''
-    this.index = index || -1
     this.childNodes = []
     this.classes = []
-    this.el = document.createElement(this.ndata && this.ndata.$tag || (ndataKey.slice(0, 2) == '$_'?'span':'div'))
-    if (typeof this.ndata == 'string' || typeof this.ndata == 'number') {
-      Object.defineProperty(ndataParent, ndataKey, {
-        get: function() {
-          return theNode.el.textContent
-        },
-        set: function(v) {
-          theNode.el.textContent = v
-        },
-        enumerable: true,
-        configurable: true
-      })
-      this.el.textContent = this.ndata
-    } else if (Array.isArray(this.ndata)) {
-      this.childNodes = this.ndata.map(function(cdata, i) {
-        var newNode = new Node(theNode.ndata, String(i), theNode, hyphenate(theNode.key)+'-item', i)
-        theNode.el.appendChild(newNode.el)
-        return newNode
-      })
-      lightAssign(this.ndata, 'push', arrayPush)
-    } else if (typeof this.ndata == 'object' && this.ndata != null) {
-      lightAssign(this.ndata, '$node', this)
-      lightAssign(this.ndata, '$render', this.render.bind(this))
-      if (this.ndata.$tag == 'input' || this.ndata.$tag == 'textarea') {
-        Object.defineProperty(this.ndata, '$value', { // $value shortcut for form inputs
-          get: function() {
-            return this.$node.el.value
-          },
-          set: function(v) {
-            this.$node.el.value = v
-          },
-          enumerable: false,
-          configurable: true
-        })
-      }
+    this.el = document.createElement(ndata && ndata.$tag || (ndataKey.slice(0, 2) == '$_'?'span':'div'))
+    key && this.el.classList.add(key)
+    if (typeof ndata == 'string' || typeof ndata == 'number') {
+      mapDom(ndataParent, ndataKey, this.el, 'textContent', true)
+      this.el.textContent = ndata
+    } else if (Array.isArray(ndata)) {
+      this._setChildren(ndata)
+    } else if (typeof ndata == 'object' && ndata != null) {
+      lightAssign(ndata, '$node', this)
+      if (ndata.$tag == 'input' || ndata.$tag == 'textarea')
+        mapDom(ndata, '$value', this.el, 'value')
       this.texts = {}
-      for (var i in this.ndata) {
-        var o = this.ndata[i]
+      for (var i in ndata) {
+        var o = ndata[i]
         if (i[0] == '$') {  //lightue directives
           if (i.slice(0, 2) == '$$') { //array or textNode
             if (i == '$$' && Array.isArray(o)) {
-              this.childNodes = o.map(function(cdata, i) {
-                var newNode = new Node(o, String(i), theNode, hyphenate(theNode.key)+'-item', i)
-                theNode.el.appendChild(newNode.el)
-                return newNode
-              })
-              lightAssign(o, 'push', arrayPush)
+              this._setChildren(o)
             } else if (typeof o == 'string' || typeof o == 'number') {
               this.texts[i] = document.createTextNode(o)
               this.el.appendChild(this.texts[i])
-              ;(function(i) {
-                Object.defineProperty(theNode.ndata, i, {
-                  get: function() {
-                    return theNode.texts[i].textContent
-                  },
-                  set: function(v) {
-                    theNode.texts[i].textContent = v
-                  },
-                  enumerable: true,
-                  configurable: true
-                })
-              })(i)
+              mapDom(ndata, i, this.texts[i], 'textContent', true)
             }
           } else if (i.slice(0, 2) == '$_') { //span element shortcut
-            var newNode = new Node(this.ndata, i, this, hyphenate(i.slice(2)))
-            this.el.appendChild(newNode.el)
-            this.childNodes.push(newNode)
+            this._addChild(new Node(ndata, i, this, hyphenate(i.slice(2))))
+          } else if (i == '$class') {
+            Object.keys(o).forEach(function(j) {
+              mapDom(o, j, theNode.el, 'classList', true, {
+                get: function(el, elKey) {
+                  return el.classList.contains(hyphenate(j))
+                },
+                set: function(el, elKey, v) {
+                  el.classList[v ? 'add' : 'remove'](hyphenate(j))
+                },
+                convert: Boolean
+              })
+            })
           }
         } else if (i[0] == '_') {
+          mapDom(ndata, i, this.el, hyphenate(i.slice(1)), true, {
+            get: function(el, elKey) {
+              return el.getAttribute(elKey)
+            },
+            set: function(el, elKey, v) {
+              el.setAttribute(elKey, v)
+            }
+          })
         } else if (i.slice(0, 2) == 'on') {
           (function(o) {
             theNode.el.addEventListener(i.slice(2), function(e) {
@@ -114,49 +126,56 @@ function Lightue(data, op) {
             })
           })(o)
         } else {
-          var newNode = new Node(this.ndata, i, this, hyphenate(i))
-          this.el.appendChild(newNode.el)
-          this.childNodes.push(newNode)
+          this._addChild(new Node(ndata, i, this, hyphenate(i)))
         }
       }
     }
   }
 
-  Node.prototype.render = function() {
-    if (this.el.className != '')
-      this.el.className = ''
-    this.classes = []
-    if (typeof this.ndata == 'object' && this.ndata != null)
-      for (var i in this.ndata) {
-        var o = this.ndata[i]
-        if (i[0] == '$') {  //lightue directives
-          if (i.slice(0, 2) == '$$') {
-            if (typeof o == 'string' || typeof o == 'number')
-              this.texts[i].textContent = o
-          } else if (i == '$class') {
-            if (Array.isArray(o)) {
-              this.classes = o
-            } else {
-              for (var j in o) {
-                if (o[j]) this.classes.push(hyphenate(j))
-              }
-            }
-          }
-        } else if (i[0] == '_') {
-          this.el.setAttribute(hyphenate(i.slice(1)), o)
-        }
-      }
-    if (this.key)
-      this.classes.push(this.key)
-    for (var i in this.classes) this.el.classList.add(this.classes[i])
-    
-    for (var i in this.childNodes) this.childNodes[i].render()
+  Node.prototype._addChild = function(childNode) {
+    this.el.appendChild(childNode.el)
+    this.childNodes.push(childNode)
+  }
+
+  Node.prototype._setChildren = function(arr) {
+    lightAssign(arr, '$node', this)
+    var theNode = this
+    this.childNodes = arr.map(function(cdata, i) {
+      var newNode = new Node(arr, i, theNode, hyphenate(theNode.key)+'-item')
+      theNode.el.appendChild(newNode.el)
+      return newNode
+    })
+    lightAssign(arr, 'push', arrayPush)
   }
 
   var root = new Node({data: data}, 'data', null, 'root')
-  root.render()
   document.querySelector(op.el || 'body').appendChild(root.el)
   return data
+}
+
+Lightue._dep = null
+
+Lightue.useState = function(src) {
+  var S = JSON.parse(JSON.stringify(src)), descs = {}, deps = {}
+  Object.keys(src).forEach(function(key) {
+    deps[key] = []
+    descs[key] = {
+      get: function() {
+        Lightue._dep && deps[key].push(Lightue._dep)
+        return src[key]
+      },
+      set: function(v) {
+        src[key] = v
+        deps[key].forEach(function(dep) {
+          dep.notify()
+        })
+      },
+      enumerable: true,
+      configurable: true
+    }
+  })
+  Object.defineProperties(S, descs)
+  return S
 }
 
 //methods

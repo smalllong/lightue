@@ -1,19 +1,21 @@
-var L = Lightue
+var L = Lightue, S = Lightue.useState({
+  selectStart: null, 
+  selectEnd: null,
+})
 function select(e, date) {
-  if (selectStart && selectStart < date && selectEnd == null)
-    selectEnd = date
+  if (S.selectStart && S.selectStart < date && S.selectEnd == null)
+    S.selectEnd = date
   else {
-    selectStart = date
-    selectEnd = null
+    S.selectStart = date
+    S.selectEnd = null
   }
-  vm.$render()
 }
 function dateEquals(d1, d2) {
   if (d1 == null || d2 == null) return false
   return d1.getTime() == d2.getTime()
 }
 
-var today = new Date(), y = today.getFullYear(), m = today.getMonth(), selectStart, selectEnd
+var today = new Date(), y = today.getFullYear(), m = today.getMonth()
 
 var vm = L({
   weekTitle: [{$$: '周', $_end: '日'}, '周一', '周二', '周三', '周四', '周五', {$$: '周', $_end: '六'}],
@@ -25,8 +27,8 @@ var vm = L({
         var d = new Date(y, m+i, j+1)
         return {
           $class: {
-            get deepBlue() {return dateEquals(d, selectStart) || selectEnd && dateEquals(d, selectEnd)},
-            get lightBlue() {return d > selectStart && selectEnd && d < selectEnd}
+            get deepBlue() {return dateEquals(d, S.selectStart) || S.selectEnd && dateEquals(d, S.selectEnd)},
+            get lightBlue() {return d > S.selectStart && S.selectEnd && d < S.selectEnd}
           },
           $$: j+1,
           onclick: [select, d],
@@ -35,7 +37,7 @@ var vm = L({
     }
   }),
   selectedText: {
-    $class: {get hidden() {return selectEnd == null}},
-    get $$() {return selectEnd == null ? '' : selectStart.toLocaleDateString() + '~' + selectEnd.toLocaleDateString()},
+    $class: {get hidden() {return S.selectEnd == null}},
+    get $$() {return S.selectEnd == null ? '' : S.selectStart.toLocaleDateString() + '~' + S.selectEnd.toLocaleDateString()},
   },
 })
