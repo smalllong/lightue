@@ -1,4 +1,4 @@
-# lightue
+# Lightue
 
 A lightweight and simple model-view framework inspired by Vue.js
 
@@ -7,9 +7,13 @@ just 1.11KiB min+br (compared with vue.js 30.06 KiB)
 ## How to use:
 
 ```html
-<script src='https://unpkg.com/lightue@0.0.1/lightue.min.js'></script>
+<script src='https://unpkg.com/lightue@0.0.2/lightue.js'></script>
 <script src='your_script.js'></script>
 ```
+
+## Compatability
+
+Lightue supports all browsers down to IE10 because it is written in ES5 and it uses `classList` feature which IE9 doesn't support.
 
 ## Quick start
 
@@ -33,10 +37,14 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
         > When there is a `$$` property and it's value is of type Array, each item in the array is parsed as a VDomSrc and the results are appended in current element one by one.
     - $$* (string | number)
         > When there is a property starts with `$$` and the value is of type `string | number` it will be rendered to a text node
+    - $_*
+        > When the property name starts with `$_`, it means to create a child element with a default `span` $tag. And the following * in the property name is used as the element class. The value is treated as a VDomSrc.
     - _*
         > When a property starts with `_`, it's a reactive mapping to the hyphenated version attribute. For example, `_dataSrc` property maps to `data-src` attribute.
     - on*
-        > To be added
+        > This is the event listener on the element. It can be a function that receive just event. It can also be an array whose first item is the listener function and following items are extra arguments passed to the listener.
+    - \* (not starts with `$`, `_` or `on`)
+        > In other cases when property name does not starts with `$`, `_` or `on`, it will create a child element with a default `div` $tag. And the property name is used as the element class. The value is treated as a VDomSrc.
 
 ## View Model
 
@@ -48,4 +56,31 @@ After processed by Lightue, the VDomSrc becomes a View Model. Generally it has t
 - $value (string)
     > For input and textarea elements, there is a $value property which can be used to get/set value of them
 
-It includes some special notations to simplify the code.
+## State and Auto Update
+
+It can be annoying to always modifying the View Model by hand. Thus like in Vue and React, Lightue provides States, which can result in automatic updates of depedent DOM places. Here's how to use it:
+
+```js
+var S = Lightue.useState({
+    width: 20,
+    height: 30
+})
+setInterval(function() {
+    S.width ++
+}, 500)
+setInterval(function() {
+    S.height ++
+}, 800)
+var vm = Lightue({
+    $$: 'width and height are: ',
+    get result() {return S.width + ':' + S.height},
+    rect: {
+        get _style() {return 'background-color: green; width: '+S.width+'px; height: '+S.height+'px'},
+    }
+})
+```
+Try the live example here: https://codepen.io/lxl898/pen/vYyooWK
+
+That's it. Just modify the state and dependent places will automatically update itself in DOM.
+
+If you have any advices or concerns, you can leave an issue :-)
