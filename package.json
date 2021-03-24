@@ -17,6 +17,7 @@
     "terser": "^4.6.3"
   },
   "browserslist": [
-    "firefox >= 9"
+    "firefox >= 9",
+    "ie >= 10"
   ]
 }

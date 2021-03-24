@@ -20,16 +20,19 @@ body {
 .select-demo-item {
   display: block;
   border: 2px solid green;
-  background-color: #bfb;
   margin: 8px;
 }
+.select-demo-item.current {
+  background-color: #bfb;
+  box-shadow: 0 0 8px green;
+}
 
-.demos {
+.demos-ground {
   margin-left: 200px;
   position: relative;
 }
 
-.demos-item {
+.demos-ground-item {
   height: 100%;
   overflow: auto;
 }
