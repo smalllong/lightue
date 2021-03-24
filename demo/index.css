@@ -12,9 +12,31 @@ body {
   height: 100%;
 }
 
+.select-demo {
+  float: left;
+  width: 200px;
+}
+
+.select-demo-item {
+  display: block;
+  border: 2px solid green;
+  background-color: #bfb;
+  margin: 8px;
+}
+
+.demos {
+  margin-left: 200px;
+  position: relative;
+}
+
+.demos-item {
+  height: 100%;
+  overflow: auto;
+}
+
 .week-title {
   background-color: rgba(192, 192, 192, 0.7);
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 16px;
   right: 16px;
@@ -53,7 +75,7 @@ body {
 
 .selected-text {
   background-color: rgba(192, 192, 192, 0.7);
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;

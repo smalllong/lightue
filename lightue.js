@@ -69,12 +69,10 @@ function Lightue(data, op) {
     this.parent = parentNode
     this.key = key || ''
     this.childNodes = []
-    this.classes = []
     this.el = document.createElement(ndata && ndata.$tag || (ndataKey.slice(0, 2) == '$_'?'span':'div'))
     key && this.el.classList.add(key)
     if (typeof ndata == 'string' || typeof ndata == 'number') {
       mapDom(ndataParent, ndataKey, this.el, 'textContent', true)
-      this.el.textContent = ndata
     } else if (Array.isArray(ndata)) {
       this._setChildren(ndata)
     } else if (typeof ndata == 'object' && ndata != null) {
@@ -88,6 +86,8 @@ function Lightue(data, op) {
           if (i.slice(0, 2) == '$$') { //array or textNode
             if (i == '$$' && Array.isArray(o)) {
               this._setChildren(o)
+            } else if (i == '$$' && typeof o == 'object') {
+              this._addChild(new Node(ndata, i, this, ''))
             } else if (typeof o == 'string' || typeof o == 'number') {
               this.texts[i] = document.createTextNode(o)
               this.el.appendChild(this.texts[i])
@@ -121,8 +121,8 @@ function Lightue(data, op) {
           (function(o) {
             theNode.el.addEventListener(i.slice(2), function(e) {
               if (Array.isArray(o))
-                o[0].apply(theNode.ndata, [e].concat(o.slice(1)))
-              else o(e)
+                o[0].apply(theNode.el, [e].concat(o.slice(1)))
+              else o.call(theNode.el, e)
             })
           })(o)
         } else {
