@@ -18,9 +18,26 @@ Lightue supports all browsers down to IE10 because it is written in ES5 and it u
 ## Quick start
 
 ```js
-var vm = Lightue(VDomSrc)
+// api
+var vm = Lightue(VDomSrc [, options ])
+
+// example
+var vm = Lightue({
+    hello: 'Hello world!'
+}, {
+    el: '#app'
+})
+setTimeout(function() {
+    vm.hello = 'Hello again!'
+}, 2000)
 ```
-This will create the Lightue Node instance and append the generated DOM to document's body. The returned vm is the View Model which we can use to control the generated DOM easily.
+The `Lightue` function will create the Lightue Node instance and append the generated DOM to document's body or other places. The returned vm is the View Model which we can use to control the generated DOM easily. In the above example, we showed a single line text and changed it 2 seconds later.
+
+## Options
+
+When calling a new Lightue, there can be an optional `options` object as a second parameter. Currently, there is only one option:
+- el (string, optional)
+    > When there is an `el` option, it specifies the mount point of the current Lightue. The value will be passed to `document.querySelector` then Lightue will append the generated DOM to this element. The default value is 'body'
 
 ## VDomSrc
 
