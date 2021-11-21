@@ -7,7 +7,7 @@ just 1.11KiB min+br (compared with vue.js 30.06 KiB)
 ## How to use:
 
 ```html
-<script src='https://unpkg.com/lightue@0.0.3-beta.1/lightue.min.js'></script>
+<script src='https://unpkg.com/lightue@0.1.1/lightue.min.js'></script>
 <script src='your_script.js'></script>
 ```
 
