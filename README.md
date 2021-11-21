@@ -104,4 +104,25 @@ Try the live example here: https://codepen.io/lxl898/pen/vYyooWK and other demos
 
 That's it. Just modify the state and dependent places will automatically update itself in DOM.
 
+## Tag shortcuts
+
+Lightue comes with some html tag shortcut methods. For example:
+
+```js
+// instead of writing:
+var L = Lightue
+var vm = L({$tag: 'table',
+    $$: [{$tag: 'tr',
+        $$: [{$tag: 'td'}]
+    }]
+})
+// it's simpler to write:
+var L = Lightue
+var vm = L(L.table({
+    $$: [L.tr({
+        $$: [L.td()]
+    })]
+}))
+```
+
 If you have any advices or concerns, you can leave an issue :-)

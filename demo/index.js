@@ -72,17 +72,15 @@ function DemoDateRangeSelect() {
 function DemoSimplifyRatio() {
   var vm = {
     inputs: {
-      width: {
-        $tag: 'input',
+      width: L.input({
         _type: 'number',
         oninput: showRatio,
-      },
+      }),
       $$: ':',
-      height: {
-        $tag: 'input',
+      height: L.input({
         _type: 'number',
         oninput: showRatio,
-      },
+      }),
     },
     result: {
       label: 'the ratio simplified is:',
@@ -121,16 +119,19 @@ function showDemo(e) {
 }
 
 function DemoRadio(index, name, checked) {
-  return {$tag: 'label',
+  return L.label({
     $class: {
       get current() {return S.curDemo == index}
     },
-    $$: {$tag: 'input', _type: 'radio',
+    $$: L.input({
+      _type: 'radio',
       _name: 'demo',
       _value: index,
       _checked: checked ? 'checked' : null,
       onchange: showDemo,
-  }, $$t: name}
+    }),
+    $$t: name
+  })
 }
 
 var demos = [DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio]

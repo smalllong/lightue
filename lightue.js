@@ -185,3 +185,17 @@ Lightue.for = function(count, generateItem) {
     arr.push(generateItem?generateItem(i):'')
   return arr
 }
+
+;(function() {
+  var htmlTags = ['div', 'span', 'form', 'label', 'input', 'select', 'img', 'button', 'table', 'tr', 'td']
+  for (var i in htmlTags) {
+    var o = htmlTags[i]
+    Lightue[o] = function(o){return function(data) {
+      if (typeof data == 'object') {
+        data.$tag = o
+        return data
+      } else if (typeof data == 'undefined')
+        return {$tag: o}
+    }}(o)
+  }
+})()
