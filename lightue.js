@@ -30,6 +30,14 @@ function Lightue(data, op) {
     op = op || {}
     op.get = op.get || function(el, elKey) {return el[elKey]}
     op.set = op.set || function(el, elKey, v) {el[elKey] = v}
+    if (typeof obj[key] == 'function') {
+      Object.defineProperty(obj, key, {
+        get: obj[key],
+        set: function() {},
+        enumerable: false,
+        configurable: true
+      })
+    }
     var property = Object.getOwnPropertyDescriptor(obj, key);
     var setter = property && property.set;
     var set = function(v) {
@@ -71,7 +79,7 @@ function Lightue(data, op) {
     this.childNodes = []
     this.el = document.createElement(ndata && ndata.$tag || (ndataKey.slice(0, 2) == '$_'?'span':'div'))
     key && this.el.classList.add(key)
-    if (typeof ndata == 'string' || typeof ndata == 'number') {
+    if (typeof ndata == 'string' || typeof ndata == 'number' || typeof ndata == 'function') {
       mapDom(ndataParent, ndataKey, this.el, 'textContent', true)
     } else if (Array.isArray(ndata)) {
       this._setChildren(ndata)
@@ -88,7 +96,7 @@ function Lightue(data, op) {
               this._setChildren(o)
             } else if (i == '$$' && typeof o == 'object') {
               this._addChild(new Node(ndata, i, this, ''))
-            } else if (typeof o == 'string' || typeof o == 'number') {
+            } else if (typeof o == 'string' || typeof o == 'number' || typeof o == 'function') {
               this.texts[i] = document.createTextNode(o)
               this.el.appendChild(this.texts[i])
               mapDom(ndata, i, this.texts[i], 'textContent', true)

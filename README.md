@@ -7,7 +7,7 @@ just 1.11KiB min+br (compared with vue.js 30.06 KiB)
 ## How to use:
 
 ```html
-<script src='https://unpkg.com/lightue@0.1.1/lightue.min.js'></script>
+<script src='https://unpkg.com/lightue@0.1.2/lightue.min.js'></script>
 <script src='your_script.js'></script>
 ```
 
@@ -97,6 +97,16 @@ var vm = Lightue({
     get result() {return S.width + ':' + S.height},
     rect: {
         get _style() {return 'background-color: green; width: '+S.width+'px; height: '+S.height+'px'},
+    }
+})
+```
+When using state in the VDomSrc, instead of using an ES5 getter, you can also just set it's value as a function which will be used as the getter. If you're in ES6 environment, arrow functions are also valid. The above example can be written as:
+```js
+var vm = Lightue({
+    $$: 'width and height are: ',
+    result: () => S.width + ':' + S.height,
+    rect: {
+        _style: () => 'background-color: green; width: '+S.width+'px; height: '+S.height+'px',
     }
 })
 ```

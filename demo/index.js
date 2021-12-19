@@ -16,9 +16,9 @@ function DemoGrowingRect() {
   }, 800)
   return {
       $$: 'width and height are: ',
-      get result() {return S.width + ':' + S.height},
+      result: () => S.width + ':' + S.height,
       rect: {
-          get _style() {return 'background-color: green; width: '+S.width+'px; height: '+S.height+'px'},
+          _style: () => 'background-color: green; width: '+S.width+'px; height: '+S.height+'px',
       }
   }
 }
@@ -53,8 +53,8 @@ function DemoDateRangeSelect() {
           var d = new Date(y, m+i, j+1)
           return {
             $class: {
-              get deepBlue() {return dateEquals(d, S.selectStart) || S.selectEnd && dateEquals(d, S.selectEnd)},
-              get lightBlue() {return d > S.selectStart && S.selectEnd && d < S.selectEnd}
+              deepBlue: () => dateEquals(d, S.selectStart) || S.selectEnd && dateEquals(d, S.selectEnd),
+              lightBlue: () => d > S.selectStart && S.selectEnd && d < S.selectEnd
             },
             $$: j+1,
             onclick: [select, d],
@@ -63,8 +63,8 @@ function DemoDateRangeSelect() {
       }
     }),
     selectedText: {
-      $class: {get hidden() {return S.selectEnd == null}},
-      get $$() {return S.selectEnd == null ? '' : S.selectStart.toLocaleDateString() + '~' + S.selectEnd.toLocaleDateString()},
+      $class: {hidden: () => S.selectEnd == null},
+      $$: () => S.selectEnd == null ? '' : S.selectStart.toLocaleDateString() + '~' + S.selectEnd.toLocaleDateString(),
     },
   }
 }
@@ -121,7 +121,7 @@ function showDemo(e) {
 function DemoRadio(index, name, checked) {
   return L.label({
     $class: {
-      get current() {return S.curDemo == index}
+      current: () => S.curDemo == index
     },
     $$: L.input({
       _type: 'radio',
@@ -140,7 +140,7 @@ var vm = L({
   selectDemo: demos.map(function(demo, i) {return DemoRadio(i, demo.name, i==0)}),
   demosGround: demos.map(function(demo, i) {
     return {
-      get _style() {return S.curDemo == i ? '' : 'display: none'},
+      _style: () => S.curDemo == i ? '' : 'display: none',
       $$: demo()
     }
   })
