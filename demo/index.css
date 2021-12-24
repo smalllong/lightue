@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  height: 100%;
+  line-height: 2.5;
+}
+
+.hidden {
+  display: none;
+}
+
+.root {
+  height: 100%;
+}
+
+.select-demo {
+  float: left;
+  width: 200px;
+}
+
+.select-demo-item {
+  display: block;
+  border: 2px solid green;
+  margin: 8px;
+}
+.select-demo-item.current {
+  background-color: #bfb;
+  box-shadow: 0 0 8px green;
+}
+
+.demos-ground {
+  margin-left: 200px;
+  position: relative;
+}
+
+.demos-ground-item {
+  height: 100%;
+  overflow: auto;
+}
+
+.week-title {
+  background-color: rgba(192, 192, 192, 0.7);
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+.week-title-item, .days-item {
+  display: inline-block;
+  text-align: center;
+  width: 14.28%;
+}
+
+.week-title-item > .end {
+  color: #0088ff;
+}
+
+.months {
+  padding: 40px 16px;
+}
+
+.months-item > .name {
+  font-size: 24px;
+  padding: 12px 16px;
+  text-align: right;
+}
+
+.deep-blue {
+  background-color: #16b;
+  color: #fff
+}
+
+.light-blue {
+  background-color: #2ad
+}
+
+.selected-text {
+  background-color: rgba(192, 192, 192, 0.7);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}

@@ -1,0 +1,23 @@
+{
+  "name": "lightue",
+  "version": "0.1.2",
+  "description": "A lightweight and simple model-view framework inspired by Vue.js",
+  "main": "lightue.js",
+  "scripts": {
+    "compress": "node compress.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smalllong/lightue.git"
+  },
+  "author": "Xiaolong Li",
+  "license": "MIT",
+  "devDependencies": {
+    "terser": "^4.6.3"
+  },
+  "browserslist": [
+    "firefox >= 9",
+    "ie >= 10"
+  ]
+}
