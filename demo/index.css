@@ -1,4 +1,4 @@
-body {
+html, body {
   margin: 0;
   height: 100%;
   line-height: 2.5;
@@ -21,6 +21,7 @@ body {
   display: block;
   border: 2px solid green;
   margin: 8px;
+  overflow: auto;
 }
 .select-demo-item.current {
   background-color: #bfb;
@@ -30,6 +31,7 @@ body {
 .demos-ground {
   margin-left: 200px;
   position: relative;
+  height: 100%;
 }
 
 .demos-ground-item {
@@ -83,4 +85,8 @@ body {
   left: 0;
   width: 100%;
   text-align: center;
+}
+
+.new-title {
+  background-color: #bfb;
 }

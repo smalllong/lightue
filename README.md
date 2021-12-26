@@ -2,12 +2,12 @@
 
 A lightweight and simple model-view framework inspired by Vue.js
 
-just 1.23KiB min+br (compared with vue.js 30.06 KiB)
+just around 1KB min+br (compared with vue.js 30.06 KiB)
 
 ## How to use:
 
 ```html
-<script src='https://unpkg.com/lightue@0.1.2/lightue.min.js'></script>
+<script src='https://unpkg.com/lightue@0.1.3/lightue.min.js'></script>
 <script src='your_script.js'></script>
 ```
 
@@ -15,25 +15,36 @@ Try the live example here: https://codepen.io/lxl898/pen/vYyooWK
 
 ## Compatability
 
-Lightue supports all browsers down to IE10 because it is written in ES5 and it uses `classList` feature which IE9 doesn't support.
+Lightue supports all modern browsers except IE.
+To get legacy browser support, you can choose version 0.1.2 which supports down to IE 10.
 
 ## Quick start
 
 ```js
 // api
+var S = Lightue.useState(stateSrc)
 var vm = Lightue(VDomSrc [, options ])
 
 // example
-var vm = Lightue({
-    hello: 'Hello world!'
-}, {
-    el: '#app'
+// specify application state
+var S = Lightue.useState({
+    text: 'Hello world!'
 })
+// create Lightue instance
+var vm = Lightue({
+    // for static content just specify statically
+    hi: 'Hi world!',
+    // for dynamic content that depends on state, use a state function (a function that uses state)
+    hello: () => S.text
+}, {
+    el: '#app' // append to <div id='app'></div>
+})
+// change the state after 2 seconds and the DOM automatically get updated
 setTimeout(function() {
-    vm.hello = 'Hello again!'
+    S.text = 'Hello again!'
 }, 2000)
 ```
-The `Lightue` function will create the Lightue Node instance and append the generated DOM to document's body or other places. The returned vm is the View Model which we can use to control the generated DOM easily. In the above example, we showed a single line text and changed it 2 seconds later.
+The `Lightue` function will create the Lightue Node instance and append the generated DOM to document's body or other places. The returned vm is the View Model which we can use to inspect the VDom. In the above example, we showed a single line text and changed it 2 seconds later.
 
 ## Options
 
@@ -63,25 +74,15 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
     - $_*
         > When the property name starts with `$_`, it means to create a child element with a default `span` $tag. And the following * in the property name is used as the element class. The value is treated as a VDomSrc
     - _*
-        > When a property starts with `_`, it's a reactive mapping to the hyphenated version attribute. For example, `_dataSrc` property maps to `data-src` attribute
+        > When a property starts with `_`, it's value will be assigned to the hyphenated version attribute. For example, `_dataSrc` property assigned to `data-src` attribute
     - on*
         > This is the event listener on the element. It can be a function that receive just event. It can also be an array whose first item is the listener function and following items are extra arguments passed to the listener
     - \* (not starts with `$`, `_` or `on`)
         > In other cases when property name does not starts with `$`, `_` or `on`, it will create a child element with a default `div` $tag. And the property name is used as the element class. The value is treated as a VDomSrc
 
-## View Model
+## stateSrc
 
-After processed by Lightue, the VDomSrc becomes a View Model (still the same reference). Generally it has the same structure as VDomSrc but it added more things:
-- string | number
-    > If the original VDomSrc is string or number, in View Model it become reactive which means you can directly get and set it and the result is just like getting and setting using DOM API
-- Array
-    > It now has a reactive `push` method, so when you do push, new element will appear
-- $value (string)
-    > For input and textarea elements, there is a $value property which can be used to get/set value of them
-
-## State and Auto Update
-
-It can be annoying to always modifying the View Model by hand. Thus like in Vue and React, Lightue provides States, which can result in automatic updates of depedent DOM places. Here's how to use it:
+The stateSrc which passed into Lightue.useState is an object. When you reassign a property of it, it will notify the relavant state function to rerender. Here's another example
 
 ```js
 var S = Lightue.useState({
@@ -94,16 +95,6 @@ setInterval(function() {
 setInterval(function() {
     S.height ++
 }, 800)
-var vm = Lightue({
-    $$: 'width and height are: ',
-    get result() {return S.width + ':' + S.height},
-    rect: {
-        get _style() {return 'background-color: green; width: '+S.width+'px; height: '+S.height+'px'},
-    }
-})
-```
-When using state in the VDomSrc, instead of using an ES5 getter, you can also just set it's value as a function which will be used as the getter. If you're in ES6 environment, arrow functions are also valid. The above example can be written as:
-```js
 var vm = Lightue({
     $$: 'width and height are: ',
     result: () => S.width + ':' + S.height,
