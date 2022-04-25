@@ -7,7 +7,7 @@ just around 1KB min+br (compared with vue.js 30.06 KiB)
 ## How to use:
 
 ```html
-<script src='https://unpkg.com/lightue@0.1.3/lightue.min.js'></script>
+<script src='https://unpkg.com/lightue@0.2.0/lightue.min.js'></script>
 <script src='your_script.js'></script>
 ```
 
@@ -22,8 +22,8 @@ To get legacy browser support, you can choose version 0.1.2 which supports down 
 
 ```js
 // api
-var S = Lightue.useState(stateSrc)
-var vm = Lightue(VDomSrc [, options ])
+var S = Lightue.useState(stateSrc)  // create state using stateSrc
+var vm = Lightue(VDomSrc [, options ])  // options is optional
 
 // example
 // specify application state
@@ -44,7 +44,11 @@ setTimeout(function() {
     S.text = 'Hello again!'
 }, 2000)
 ```
-The `Lightue` function will create the Lightue Node instance and append the generated DOM to document's body or other places. The returned vm is the View Model which we can use to inspect the VDom. In the above example, we showed a single line text and changed it 2 seconds later.
+As you can see, to create a simple Lightue application, first you need to specify some application states using Lightue.useState(). Then create a Lightue instance using Lightue() function which receives a VDomSrc object as the first parameter (which works as a template).
+
+At this time you'll be able to see the rendered result in browser. And when you change state, the rendered DOM will be updated. In the above example, we showed a single line text and changed it 2 seconds later.
+
+In detail, the `Lightue` function will create the Lightue Node tree according to VDomSrc, generate corresponding DOM elements, and append the generated DOM tree to document's body or other places.
 
 ## Options
 

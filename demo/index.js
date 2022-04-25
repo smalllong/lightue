@@ -139,16 +139,20 @@ function DemoList() {
   setInterval(() => {
     count++
     S.newTitle = !S.newTitle
-    var temp = []
-    for (var i = 0; i < count; i++) {
-      temp.push(Math.random())
+    if (S.newTitle) {
+      S.list.push(Math.random())
+    } else {
+      var temp = []
+      for (var i = 0; i < count; i++) {
+        temp.push(Math.random())
+      }
+      S.list = temp
     }
-    S.list = temp
   }, 3000)
   return {
     title: {
       $class: { newTitle: () => S.newTitle, oldTitle: () => !S.newTitle },
-      content: () => (S.newTitle ? 'new title' : 'old title'),
+      content: () => (S.newTitle ? 'item pushed' : 'list changed'),
     },
     theList: {
       beforeList: () => 'The list starts with length: ' + S.list.length,
