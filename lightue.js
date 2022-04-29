@@ -1,6 +1,5 @@
-var Lightue = (function() {
-
-var _dep = null, _arrToNode = new WeakMap(),
+var _dep = null,
+  _arrToNode = new WeakMap(),
   _rendering = false // executing user render function
 
 function Lightue(data, op = {}) {
@@ -8,7 +7,7 @@ function Lightue(data, op = {}) {
   document.querySelector(op.el || 'body').appendChild(root.el)
   return data
 }
-Lightue._abortDep = false  // user can abort dependent update
+Lightue._abortDep = false // user can abort dependent update
 
 function hyphenate(str) {
   return str.replace(/\B([A-Z])/g, '-$1').toLowerCase()
@@ -37,34 +36,17 @@ function isObj(data) {
   return typeof data == 'object' && data != null
 }
 
-//assign a non-enumerable value
-function lightAssign(obj, key, val) {
-  Object.defineProperty(obj, key, {
-    value: val,
-    enumerable: false,
-    writable: true,
-    configurable: true,
-  })
-}
-
 function extendFunc(original, coming, initial) {
   if (typeof original == 'function') {
-    return function(...args) {
+    return function (...args) {
       original.call(this, ...args)
       coming.call(this, ...args)
     }
-  } else return function(...args) {
-    initial && initial.call(this, ...args)
-    coming.call(this, ...args)
-  }
-}
-
-function getLast(arr) {
-  return arr[arr.length-1]
-}
-
-function insertAfter(newNode, node) {
-  node.parentNode.insertBefore(newNode, node.nextSibling)
+  } else
+    return function (...args) {
+      initial && initial.call(this, ...args)
+      coming.call(this, ...args)
+    }
 }
 
 // VDOM Node
@@ -104,8 +86,7 @@ function Node(ndataParent, ndataKey, key) {
                 var newNode = new Node(v, j, hyphenate(ndataKey) + '-item')
                 return tempFragment.appendChild(newNode.el)
               })
-            }
-            else newEls.push(tempFragment.appendChild(document.createElement('span')))
+            } else newEls.push(tempFragment.appendChild(document.createElement('span')))
             this.el.insertBefore(tempFragment, this.arrEnd)
             this.childArrEls.forEach((child) => child.remove())
             this.childArrEls = newEls
@@ -126,7 +107,8 @@ function Node(ndataParent, ndataKey, key) {
             el.classList[v ? 'add' : 'remove'](hyphenate(j))
           })
         })
-      }
+      } else if (i == '$value' && ['input', 'textarea'].indexOf(this.tag) > -1)
+        mapDom(ndata, '$value', this.el, 'value')
     } else if (i[0] == '_') {
       ;((attr) => {
         mapDom(ndata, i, this.el, function (el, v) {
@@ -159,13 +141,17 @@ Node.prototype._addChild = function (o, oValue, ndata, i, key) {
 
 Lightue.useState = function (src) {
   if (!isObj(src) || src._ls) return src
-  var deps = {}, subStates = {}, depItem, hash = Math.random()
+  var deps = {},
+    subStates = {},
+    depItem
   function set(src, key, value) {
-    var regather = false  // is it needed to regather deps
-    if (value && value._ls) {  // already a state, just use
+    var regather = false // is it needed to regather deps
+    if (value && value._ls) {
+      // already a state, just use
       src[key] = value._target
       subStates[key] = value
-    } else {  // create new state & cache
+    } else {
+      // create new state & cache
       src[key] = value
       if (isObj(value)) {
         subStates[key] = Lightue.useState(value)
@@ -178,23 +164,22 @@ Lightue.useState = function (src) {
       deps[key] && deps[key].forEach((dep) => dep(regather))
       if (Array.isArray(src)) {
         key = parseInt(key)
-        key >=0 && depItem && depItem(value, key)
+        key >= 0 && depItem && depItem(value, key)
       }
     }
     return true
   }
   if (Array.isArray(src))
     return new Proxy(src, {
-      get: function(src, key) {
+      get: function (src, key) {
         if (key == '_ls') return true
         if (key == '_target') return src
 
         // When array's 'map' is used to render list, trap it
-        if (key=='map' && _rendering) {
-          return function(callback) {
+        if (key == 'map' && _rendering) {
+          return function (callback) {
             var result = src.map((item, i) => {
-              if (isObj(item))
-                subStates[i] = subStates[i] || Lightue.useState(item)
+              if (isObj(item)) subStates[i] = subStates[i] || Lightue.useState(item)
               return callback(subStates[i] || item, i)
             })
             result.$mappedFrom = src
@@ -210,7 +195,7 @@ Lightue.useState = function (src) {
               _rendering = false
               wrapper[i] = newDomSrc
               var newNode = new Node(wrapper, i, hyphenate(node.ndataKey) + '-item')
-              node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd )
+              node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd)
               node.childArrEls[i] && node.childArrEls[i].remove()
               node.childArrEls.splice(i, 1, newNode.el)
             })
@@ -222,15 +207,14 @@ Lightue.useState = function (src) {
         if (!deps[key]) deps[key] = new Set()
         _dep && deps[key].add(_dep)
         var result = src[key]
-        if (isObj(result))
-          subStates[key] = subStates[key] || Lightue.useState(result)
+        if (isObj(result)) subStates[key] = subStates[key] || Lightue.useState(result)
 
         return subStates[key] || result
       },
       set: set,
     })
   return new Proxy(src, {
-    get: function(src, key) {
+    get: function (src, key) {
       if (key == '_ls') return true
       if (key == '_target') return src
       if (src[key] != null && !src.hasOwnProperty(key)) {
@@ -240,8 +224,7 @@ Lightue.useState = function (src) {
       if (!deps[key]) deps[key] = new Set()
       _dep && deps[key].add(_dep)
       var result = src[key]
-      if (isObj(result))
-        subStates[key] = subStates[key] || Lightue.useState(result)
+      if (isObj(result)) subStates[key] = subStates[key] || Lightue.useState(result)
       return subStates[key] || result
     },
     set: set,
@@ -269,5 +252,4 @@ Lightue.for = function (count, generateItem) {
   }
 })()
 
-return Lightue
-})()
+export default Lightue

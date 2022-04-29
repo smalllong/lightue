@@ -2,7 +2,7 @@ const fs = require('fs')
 const terser = require("terser")
 const zlib = require('zlib')
 
-const src = fs.readFileSync('lightue.js').toString()
+const src = fs.readFileSync('iife.js').toString()
 
 const minified = terser.minify(src).code
 

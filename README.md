@@ -7,7 +7,7 @@ just around 1KB min+br (compared with vue.js 30.06 KiB)
 ## How to use:
 
 ```html
-<script src='https://unpkg.com/lightue@0.2.0/lightue.min.js'></script>
+<script src='https://unpkg.com/lightue@0.2.1/lightue.min.js'></script>
 <script src='your_script.js'></script>
 ```
 
@@ -69,6 +69,8 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
         > This specifies classes of the current element. The key is the class name, and the value is boolean indicating whether to add the class
     - $tag (string)
         > This is the tag name of the element, such as 'div', 'span', 'input'. When omitted, it is 'div' by default
+    - $value
+        > For input and textarea elements, `$value` will set their value property. Note this is different from setting `_value` which only sets the html attribute.
     - $$ (Array)
         > When there is a `$$` property and it's value is of type Array, each item in the array is parsed as a VDomSrc and the results are appended in current element one by one
     - $$ (Object)
@@ -86,8 +88,7 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
 
 ## stateSrc
 
-The stateSrc which passed into Lightue.useState is an object. When you reassign a property of it, it will notify the relavant state function to rerender. Here's another example
-
+The stateSrc which passed into Lightue.useState is an object. The `useState` method will turn it into a reactive state. When you reassign a property of it, it will notify the relavant state function to rerender. Here's another example:
 ```js
 var S = Lightue.useState({
     width: 20,
@@ -107,6 +108,30 @@ var vm = Lightue({
     }
 })
 ```
+
+Nested states are supported, so this will work:
+```js
+var S = Lightue.useState({
+    size: {
+        width: 20,
+        height: 30
+    }
+})
+setInterval(function() {
+    S.size.width ++
+}, 500)
+```
+
+Arrays are also supported, so this will also work:
+```js
+var S = Lightue.useState({
+    size: [20, 30]
+})
+setInterval(function() {
+    S.size[0] ++
+}, 500)
+```
+
 Try the live example here: https://codepen.io/lxl898/pen/vYyooWK and other demos in the demo folder.
 
 That's it. Just modify the state and dependent places will automatically update itself in DOM.

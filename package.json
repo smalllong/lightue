@@ -2,9 +2,13 @@
   "name": "lightue",
   "version": "0.2.0",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
-  "main": "lightue.js",
+  "main": "cjs.js",
+  "module": "lightue.js",
+  "browser": "lightue.min.js",
   "scripts": {
-    "compress": "node compress.js",
+    "build-browser": "rollup lightue.js --format iife --name 'Lightue' --file iife.js",
+    "build-node": "rollup lightue.js --format cjs --file cjs.js",
+    "build": "yarn build-browser && yarn build-node && node compress.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
