@@ -38,6 +38,10 @@ function isObj(data) {
   return typeof data == 'object' && data != null
 }
 
+function assignObj(target, obj) {
+  for (var i in obj) target[i] = obj[i];
+}
+
 function extendFunc(original, coming, initial) {
   if (typeof original == 'function') {
     return function (...args) {
@@ -240,16 +244,50 @@ Lightue.for = function (count, generateItem) {
   return arr
 }
 ;(function () {
-  var htmlTags = ['div', 'span', 'form', 'label', 'input', 'select', 'img', 'button', 'table', 'tr', 'td'];
+  var htmlTags = [
+    'div',
+    'span',
+    'form',
+    'label',
+    'input',
+    'select',
+    'img',
+    'button',
+    'table',
+    'tr',
+    'td',
+    'a',
+    'ul',
+    'li',
+  ];
   for (var i in htmlTags) {
     var o = htmlTags[i];
     Lightue[o] = (function (o) {
-      return function (data) {
-        if (typeof data == 'object') {
-          data.$tag = o;
-          return data
-        } else if (typeof data == 'undefined') return { $tag: o }
+      function getTagClassWrapper(className) {
+        return function (data) {
+          var tmp = {
+            $tag: o,
+          };
+          if (className) {
+            tmp.$class = {};
+            tmp.$class[className] = 1;
+          }
+          if (isPrimitive(data) || Array.isArray(data)) {
+            tmp.$$ = data;
+            return tmp
+          } else if (isObj(data)) {
+            data.$tag = o;
+            if (isObj(data.$class) && tmp.$class) assignObj(data.$class, tmp.$class);
+            else if (tmp.$class) data.$class = tmp.$class;
+            return data
+          } else if (data == null || typeof data == 'undefined') return tmp
+        }
       }
+      return new Proxy(getTagClassWrapper(), {
+        get: function (src, key) {
+          return getTagClassWrapper(key)
+        },
+      })
     })(o);
   }
 })();

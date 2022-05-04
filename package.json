@@ -20,6 +20,16 @@
   "devDependencies": {
     "terser": "^4.6.3"
   },
+  "keywords": [
+    "lightue",
+    "lightweight",
+    "reactive",
+    "state",
+    "frontend",
+    "framework",
+    "virtual dom",
+    "vdom"
+  ],
   "browserslist": [
     "firefox >= 27"
   ]
