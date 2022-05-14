@@ -17,7 +17,7 @@ A lightweight and simple model-view framework inspired by Vue.js
 ## How to use:
 
 ```html
-<script src="https://unpkg.com/lightue@0.2.2/lightue.min.js"></script>
+<script src="https://unpkg.com/lightue@0.2.3/lightue.min.js"></script>
 <script src="your_script.js"></script>
 ```
 
