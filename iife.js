@@ -6,9 +6,7 @@ var Lightue = (function () {
     _rendering = false; // executing user render function
 
   function Lightue(data, op = {}) {
-    var root = new Node({ data: data }, 'data', 'root');
-    document.querySelector(op.el || 'body').appendChild(root.el);
-    return data
+    return new Node({ data: data }, 'data', 'root', document.querySelector(op.el || 'body'))
   }
   Lightue._abortDep = false; // user can abort dependent update
 
@@ -58,10 +56,10 @@ var Lightue = (function () {
 
   // VDOM Node
   // grab ndata from parent to make it newest (avoid value assign)
-  function Node(ndataParent, ndataKey, key) {
+  function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
     this.ndataKey = ndataKey = String(ndataKey);
-    var ndata = ndataParent[ndataKey],
-      ndataValue = typeof ndata == 'function' ? ndata() : ndata;
+    var ndata = ndataParent[ndataKey];
+    ndataValue = ndataValue || (typeof ndata == 'function' ? ndata() : ndata);
     if (isPrimitive(ndataValue) || Array.isArray(ndataValue) || ndataValue == null) ndata = { $$: ndata };
     else if (typeof ndata == 'function') ndata = ndataValue;
     this.key = key || '';
@@ -69,14 +67,17 @@ var Lightue = (function () {
     this.childEls = {};
     this.tag = (ndata && ndata.$tag) || (ndataKey.slice(0, 2) == '$_' ? 'span' : 'div');
     this.el = document.createElement(this.tag);
+    if (originalEl && originalEl.parentNode) {
+      originalEl.parentNode.insertBefore(this.el, originalEl);
+      originalEl.remove();
+    } else appendToEl && appendToEl.appendChild(this.el);
     key && this.el.classList.add(key);
     this.texts = {};
     this.el.VNode = this;
     for (var i in ndata) {
-      var o = ndata[i],
-        oValue = o;
-      if (i.slice(0, 2) != 'on' && typeof o == 'function') oValue = o();
+      var o = ndata[i];
       if (i[0] == '$') {
+        var oValue = typeof o == 'function' ? o() : o;
         //lightue directives
         if (i.slice(0, 2) == '$$') {
           if (i == '$$' && Array.isArray(oValue)) {
@@ -90,8 +91,7 @@ var Lightue = (function () {
               if (Array.isArray(v)) {
                 if (v.$mappedFrom) _arrToNode.set(v.$mappedFrom, this);
                 newEls = v.map((item, j) => {
-                  var newNode = new Node(v, j, hyphenate(ndataKey) + '-item');
-                  return tempFragment.appendChild(newNode.el)
+                  return new Node(v, j, hyphenate(ndataKey) + '-item', tempFragment).el
                 });
               } else newEls.push(tempFragment.appendChild(document.createElement('span')));
               this.el.insertBefore(tempFragment, this.arrEnd);
@@ -99,7 +99,7 @@ var Lightue = (function () {
               this.childArrEls = newEls;
             });
           } else if (i == '$$' && isObj(oValue)) {
-            this._addChild(o, oValue, ndata, i);
+            this._addChild(o, ndata, i);
           } else if (isPrimitive(oValue)) {
             this.texts[i] = document.createTextNode(oValue);
             this.el.appendChild(this.texts[i]);
@@ -107,7 +107,7 @@ var Lightue = (function () {
           }
         } else if (i.slice(0, 2) == '$_') {
           //span element shortcut
-          this.el.appendChild(new Node(ndata, i, hyphenate(i.slice(2))).el);
+          new Node(ndata, i, hyphenate(i.slice(2)), this.el);
         } else if (i == '$class') {
           Object.keys(o).forEach((j) => {
             mapDom(o, j, this.el, function (el, v) {
@@ -123,19 +123,17 @@ var Lightue = (function () {
           });
         })(hyphenate(i.slice(1)));
       } else if (i.slice(0, 2) == 'on') this.el.addEventListener(i.slice(2), o);
-      else this._addChild(o, oValue, ndata, i, hyphenate(i));
+      else this._addChild(o, ndata, i, hyphenate(i));
     }
   }
 
-  Node.prototype._addChild = function (o, oValue, ndata, i, key) {
-    if (typeof o == 'function' && isObj(oValue))
+  Node.prototype._addChild = function (o, ndata, i, key) {
+    if (typeof o == 'function')
       mapDom(ndata, i, this.el, (el, v) => {
-        this.childEls[i] && this.childEls[i].remove();
-        setTimeout(() => {
-          this.childEls[i] = this.el.appendChild(new Node(ndata, i, key).el);
-        });
+        // only create new VNode when first render or obj rerender
+        if (!this.childEls[i] || isObj(v)) this.childEls[i] = new Node(ndata, i, key, this.el, v, this.childEls[i]).el;
       });
-    else this.el.appendChild(new Node(ndata, i, key).el);
+    else new Node(ndata, i, key, this.el);
   };
 
   Lightue.useState = function (src) {
