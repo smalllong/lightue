@@ -122,16 +122,8 @@ var Lightue = (function () {
             v != null ? el.setAttribute(attr, v) : el.removeAttribute(attr);
           });
         })(hyphenate(i.slice(1)));
-      } else if (i.slice(0, 2) == 'on') {
-  ((o) => {
-          this.el.addEventListener(i.slice(2), (e) => {
-            if (Array.isArray(o)) o[0].apply(this.el, [e].concat(o.slice(1)));
-            else o.call(this.el, e);
-          });
-        })(o);
-      } else {
-        this._addChild(o, oValue, ndata, i, hyphenate(i));
-      }
+      } else if (i.slice(0, 2) == 'on') this.el.addEventListener(i.slice(2), o);
+      else this._addChild(o, oValue, ndata, i, hyphenate(i));
     }
   }
 

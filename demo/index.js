@@ -28,7 +28,7 @@ function DemoDateRangeSelect() {
     selectStart: null,
     selectEnd: null,
   })
-  function select(e, date) {
+  function select(date) {
     if (S.selectStart && S.selectStart < date && S.selectEnd == null) S.selectEnd = date
     else {
       S.selectStart = date
@@ -68,7 +68,7 @@ function DemoDateRangeSelect() {
                 lightBlue: () => d > S.selectStart && S.selectEnd && d < S.selectEnd,
               },
               $$: j + 1,
-              onclick: [select, d],
+              onclick: (e) => select(d),
             }
           })
         ),

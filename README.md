@@ -94,7 +94,7 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
   - \_\*
     > When a property starts with `_`, it's value will be assigned to the hyphenated version attribute. For example, `_dataSrc` property assigned to `data-src` attribute
   - on\*
-    > This is the event listener on the element. It can be a function that receive just event. It can also be an array whose first item is the listener function and following items are extra arguments passed to the listener
+    > This is the event listener on the element. It will be added to the element using native `addEventListener`.
   - \* (not starts with `$`, `_` or `on`)
     > In other cases when property name does not starts with `$`, `_` or `on`, it will create a child element with a default `div` $tag. And the property name is used as the element class. The value is treated as a VDomSrc
 
