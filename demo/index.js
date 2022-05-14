@@ -8,13 +8,17 @@ function DemoGrowingRect() {
     width: 20,
     height: 30,
   })
-  setInterval(function () {
+  var growWidth = setInterval(function () {
     S.width++
   }, 500)
-  setInterval(function () {
+  var growHeight = setInterval(function () {
     S.height++
   }, 800)
   return {
+    $cleanup: () => {
+      clearInterval(growWidth)
+      clearInterval(growHeight)
+    },
     $$: 'width and height are: ',
     result: () => S.width + ':' + S.height,
     rect: {
@@ -136,7 +140,7 @@ function DemoList() {
       newTitle: false,
     }),
     count = 0
-  setInterval(() => {
+  var changeList = setInterval(() => {
     count++
     S.newTitle = !S.newTitle
     if (S.newTitle) {
@@ -150,6 +154,7 @@ function DemoList() {
     }
   }, 3000)
   return {
+    $cleanup: () => clearInterval(changeList),
     title: {
       $class: { newTitle: () => S.newTitle, oldTitle: () => !S.newTitle },
       content: () => (S.newTitle ? 'item pushed' : 'list changed'),

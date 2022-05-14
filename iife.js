@@ -54,6 +54,11 @@ var Lightue = (function () {
       }
   }
 
+  function safeRemove(el) {
+    el.VNode && el.VNode.cleanup && el.VNode.cleanup();
+    el.remove();
+  }
+
   // VDOM Node
   // grab ndata from parent to make it newest (avoid value assign)
   function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
@@ -69,7 +74,7 @@ var Lightue = (function () {
     this.el = document.createElement(this.tag);
     if (originalEl && originalEl.parentNode) {
       originalEl.parentNode.insertBefore(this.el, originalEl);
-      originalEl.remove();
+      safeRemove(originalEl);
     } else appendToEl && appendToEl.appendChild(this.el);
     key && this.el.classList.add(key);
     this.texts = {};
@@ -77,9 +82,9 @@ var Lightue = (function () {
     for (var i in ndata) {
       var o = ndata[i];
       if (i[0] == '$') {
-        var oValue = typeof o == 'function' ? o() : o;
         //lightue directives
         if (i.slice(0, 2) == '$$') {
+          var oValue = typeof o == 'function' ? o() : o;
           if (i == '$$' && Array.isArray(oValue)) {
             this.arrStart = new Comment('arr start');
             this.arrEnd = new Comment('arr end');
@@ -95,7 +100,7 @@ var Lightue = (function () {
                 });
               } else newEls.push(tempFragment.appendChild(document.createElement('span')));
               this.el.insertBefore(tempFragment, this.arrEnd);
-              this.childArrEls.forEach((child) => child.remove());
+              this.childArrEls.forEach(safeRemove);
               this.childArrEls = newEls;
             });
           } else if (i == '$$' && isObj(oValue)) {
@@ -116,6 +121,7 @@ var Lightue = (function () {
           });
         } else if (i == '$value' && ['input', 'textarea'].indexOf(this.tag) > -1)
           mapDom(ndata, '$value', this.el, 'value');
+        else if (i == '$cleanup') this.cleanup = o;
       } else if (i[0] == '_') {
   ((attr) => {
           mapDom(ndata, i, this.el, function (el, v) {
@@ -193,7 +199,7 @@ var Lightue = (function () {
                 wrapper[i] = newDomSrc;
                 var newNode = new Node(wrapper, i, hyphenate(node.ndataKey) + '-item');
                 node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd);
-                node.childArrEls[i] && node.childArrEls[i].remove();
+                node.childArrEls[i] && safeRemove(node.childArrEls[i]);
                 node.childArrEls.splice(i, 1, newNode.el);
               });
               return result

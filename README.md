@@ -1,4 +1,5 @@
 # Lightue
+
 <a href="https://npmjs.com/package/lightue"><img src="https://img.shields.io/npm/v/lightue.svg" alt="npm-v"></a>
 <a href="https://npmjs.com/package/lightue"><img src="https://img.shields.io/npm/dt/lightue.svg" alt="npm-d"></a>
 <a href="https://bundlephobia.com/result?p=lightue"><img src="https://img.badgesize.io/https:/unpkg.com/lightue/lightue.min.js?label=brotli&compression=brotli" alt="brotli"></a>
@@ -82,7 +83,9 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
   - $tag (string)
     > This is the tag name of the element, such as 'div', 'span', 'input'. When omitted, it is 'div' by default
   - $value
-    > For input and textarea elements, `$value` will set their value property. Note this is different from setting `_value` which only sets the html attribute.
+    > For input and textarea elements, `$value` will set their value property. Note this is different from setting `_value` which only sets the html attribute
+  - $cleanup
+    > Sets the function which will be called when the element is about to be removed from document. Usually contains something like `clearInterval`
   - \$$(Array)
     > When there is a `$$` property and it's value is of type Array, each item in the array is parsed as a VDomSrc and the results are appended in current element one by one
   - \$$(Object)

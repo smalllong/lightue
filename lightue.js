@@ -51,6 +51,11 @@ function extendFunc(original, coming, initial) {
     }
 }
 
+function safeRemove(el) {
+  el.VNode && el.VNode.cleanup && el.VNode.cleanup()
+  el.remove()
+}
+
 // VDOM Node
 // grab ndata from parent to make it newest (avoid value assign)
 function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
@@ -66,7 +71,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.el = document.createElement(this.tag)
   if (originalEl && originalEl.parentNode) {
     originalEl.parentNode.insertBefore(this.el, originalEl)
-    originalEl.remove()
+    safeRemove(originalEl)
   } else appendToEl && appendToEl.appendChild(this.el)
   key && this.el.classList.add(key)
   this.texts = {}
@@ -74,9 +79,9 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   for (var i in ndata) {
     var o = ndata[i]
     if (i[0] == '$') {
-      var oValue = typeof o == 'function' ? o() : o
       //lightue directives
       if (i.slice(0, 2) == '$$') {
+        var oValue = typeof o == 'function' ? o() : o
         if (i == '$$' && Array.isArray(oValue)) {
           this.arrStart = new Comment('arr start')
           this.arrEnd = new Comment('arr end')
@@ -92,7 +97,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
               })
             } else newEls.push(tempFragment.appendChild(document.createElement('span')))
             this.el.insertBefore(tempFragment, this.arrEnd)
-            this.childArrEls.forEach((child) => child.remove())
+            this.childArrEls.forEach(safeRemove)
             this.childArrEls = newEls
           })
         } else if (i == '$$' && isObj(oValue)) {
@@ -113,6 +118,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
         })
       } else if (i == '$value' && ['input', 'textarea'].indexOf(this.tag) > -1)
         mapDom(ndata, '$value', this.el, 'value')
+      else if (i == '$cleanup') this.cleanup = o
     } else if (i[0] == '_') {
       ;((attr) => {
         mapDom(ndata, i, this.el, function (el, v) {
@@ -190,7 +196,7 @@ Lightue.useState = function (src) {
               wrapper[i] = newDomSrc
               var newNode = new Node(wrapper, i, hyphenate(node.ndataKey) + '-item')
               node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd)
-              node.childArrEls[i] && node.childArrEls[i].remove()
+              node.childArrEls[i] && safeRemove(node.childArrEls[i])
               node.childArrEls.splice(i, 1, newNode.el)
             })
             return result
