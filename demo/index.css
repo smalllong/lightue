@@ -90,3 +90,10 @@ html, body {
 .new-title {
   background-color: #bfb;
 }
+
+.demo-form-item {
+  display: block;
+}
+.demo-form > .result {
+  word-break: break-all;
+}

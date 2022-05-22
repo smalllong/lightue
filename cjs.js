@@ -118,13 +118,15 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
             el.classList[v ? 'add' : 'remove'](hyphenate(j));
           });
         });
-      } else if (i == '$value' && ['input', 'textarea'].indexOf(this.tag) > -1)
+      } else if (i == '$value' && ['input', 'textarea', 'select'].indexOf(this.tag) > -1)
         mapDom(ndata, '$value', this.el, 'value');
+      else if (i == '$checked' && this.tag == 'input')
+        mapDom(ndata, '$checked', this.el, 'checked');
       else if (i == '$cleanup') this.cleanup = o;
     } else if (i[0] == '_') {
 ((attr) => {
         mapDom(ndata, i, this.el, function (el, v) {
-          v != null ? el.setAttribute(attr, v) : el.removeAttribute(attr);
+          v != null && v !== false ? el.setAttribute(attr, v) : el.removeAttribute(attr);
         });
       })(hyphenate(i.slice(1)));
     } else if (i.slice(0, 2) == 'on') this.el.addEventListener(i.slice(2), o);
@@ -247,6 +249,7 @@ Lightue.for = function (count, generateItem) {
     'label',
     'input',
     'select',
+    'option',
     'img',
     'button',
     'table',
@@ -255,6 +258,10 @@ Lightue.for = function (count, generateItem) {
     'a',
     'ul',
     'li',
+    'section',
+    'header',
+    'footer',
+    'p',
   ];
   for (var i in htmlTags) {
     var o = htmlTags[i];

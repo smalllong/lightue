@@ -18,7 +18,7 @@ A lightweight and simple model-view framework inspired by Vue.js
 
 Use the CDN file and there will be `Lightue` in the global scope
 ```html
-<script src="https://unpkg.com/lightue@0.2.3/lightue.min.js"></script>
+<script src="https://unpkg.com/lightue@0.2.4/lightue.min.js"></script>
 <script src="your_script.js"></script>
 ```
 Or install it ( `yarn add lightue` ) and bundle it using either rollup or webpack
@@ -90,7 +90,9 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
   - $tag (string)
     > This is the tag name of the element, such as 'div', 'span', 'input'. When omitted, it is 'div' by default
   - $value
-    > For input and textarea elements, `$value` will set their value property. Note this is different from setting `_value` which only sets the html attribute
+    > For input, textarea and select elements, `$value` will set their value property. Note this is different from setting `_value` which only sets the html attribute
+  - $checked
+    > For input elements whose type is checkbox or radio, `$checked` will set their checked property.
   - $cleanup
     > Sets the function which will be called when the element is about to be removed from document. Usually contains something like `clearInterval`
   - \$$(Array)
