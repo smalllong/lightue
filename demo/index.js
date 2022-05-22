@@ -136,9 +136,9 @@ function DemoSimplifyRatio() {
 
 function DemoList() {
   var S = L.useState({
-    list: [],
-    newTitle: false,
-  }),
+      list: [],
+      newTitle: false,
+    }),
     count = 0
   var changeList = setInterval(() => {
     count++
@@ -174,47 +174,51 @@ function DemoForm() {
       description: "I'm new to Lightue!\nHow about you?",
       workDone: true,
       group: 'groupA',
-    }
+    },
   })
   return {
     demoForm: L.form({
-      $$: [L.label({
-        $_: 'name: ',
-        $$: L.input({
-          _type: 'text',
-          $value: () => S.formData.name,
-          oninput: e => S.formData.name = e.target.value,
-        })
-      }),
-      L.label({
-        $_: 'description: ',
-        $$: {
-          $tag: 'textarea',
-          $value: () => S.formData.description,
-          oninput: e => S.formData.description = e.target.value,
-        }
-      }),
-      L.label({
-        $_: 'work done? ',
-        $$: L.input({
-          _type: 'checkbox',
-          $checked: () => S.formData.workDone,
-          onchange: e => S.formData.workDone = e.target.checked,
-        })
-      }),
-      L.label({
-        $_: 'group: ',
-        $$: L.select({
-          $$: ['', 'groupA', 'groupB', 'groupC', 'groupD'].map(op => L.option({
-            _value: op,
-            $$: op,
-          })),
-          $value: () => S.formData.group,
-          onchange: e => S.formData.group = e.target.value,
+      $$: [
+        L.label({
+          $_: 'name: ',
+          $$: L.input({
+            _type: 'text',
+            $value: () => S.formData.name,
+            oninput: (e) => (S.formData.name = e.target.value),
+          }),
         }),
-      })],
-      result: () => JSON.stringify(S.formData)
-    })
+        L.label({
+          $_: 'description: ',
+          $$: {
+            $tag: 'textarea',
+            $value: () => S.formData.description,
+            oninput: (e) => (S.formData.description = e.target.value),
+          },
+        }),
+        L.label({
+          $_: 'work done? ',
+          $$: L.input({
+            _type: 'checkbox',
+            $checked: () => S.formData.workDone,
+            onchange: (e) => (S.formData.workDone = e.target.checked),
+          }),
+        }),
+        L.label({
+          $_: 'group: ',
+          $$: L.select({
+            $$: ['', 'groupA', 'groupB', 'groupC', 'groupD'].map((op) =>
+              L.option({
+                _value: op,
+                $$: op,
+              })
+            ),
+            $value: () => S.formData.group,
+            onchange: (e) => (S.formData.group = e.target.value),
+          }),
+        }),
+      ],
+      result: () => JSON.stringify(S.formData),
+    }),
   }
 }
 

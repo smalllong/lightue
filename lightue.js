@@ -118,8 +118,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
         })
       } else if (i == '$value' && ['input', 'textarea', 'select'].indexOf(this.tag) > -1)
         mapDom(ndata, '$value', this.el, 'value')
-      else if (i == '$checked' && this.tag == 'input')
-        mapDom(ndata, '$checked', this.el, 'checked')
+      else if (i == '$checked' && this.tag == 'input') mapDom(ndata, '$checked', this.el, 'checked')
       else if (i == '$cleanup') this.cleanup = o
     } else if (i[0] == '_') {
       ;((attr) => {
@@ -159,6 +158,7 @@ Lightue.useState = function (src) {
         subStates[key] = Lightue.useState(value)
         regather = true
       } else {
+        if (Array.isArray(src) && key == 'length') regather = true // regather deps when arr length changed
         delete subStates[key]
       }
     }
