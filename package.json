@@ -20,6 +20,7 @@
   "devDependencies": {
     "terser": "^4.6.3"
   },
+  "files": ["lightue.js"],
   "keywords": [
     "lightue",
     "lightweight",
