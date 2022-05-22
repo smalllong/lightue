@@ -35,6 +35,10 @@ Try the live example here: https://codepen.io/lxl898/pen/vYyooWK
 Lightue supports all modern browsers except IE.
 To get legacy browser support, you can choose version 0.1.2 which supports down to IE 10.
 
+## TodoMVC
+
+If you are already familiar with some other FE frameworks, you can learn Lightue quickly by comparing [todo.html](https://github.com/smalllong/lightue/blob/master/todo.html) with [other implementations](https://github.com/tastejs/todomvc)
+
 ## Quick start
 
 ```js

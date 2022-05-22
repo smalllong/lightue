@@ -12,6 +12,11 @@ commander@^2.20.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
+director@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.npmmirror.com/director/-/director-1.2.8.tgz#c6d9b4dd890e9aff5365183fe9cc8e73994cf2d5"
+  integrity sha512-7v1NS2Fsv0kv+FbI2xqDHvm2UWSL7J4glCGk29m7/+pPi9r/Vq6o9OXQc3JprWMdZMYnBvohRBzxJGRIXjsQDg==
+
 source-map-support@~0.5.12:
   version "0.5.19"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.19.tgz#a98b62f86dcaf4f67399648c085291ab9e8fed61"
@@ -33,3 +38,13 @@ terser@^4.6.3:
     commander "^2.20.0"
     source-map "~0.6.1"
     source-map-support "~0.5.12"
+
+todomvc-app-css@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.npmmirror.com/todomvc-app-css/-/todomvc-app-css-2.4.2.tgz#bb0f53a125ad079efdd2ca7ad692ddf39f39efa8"
+  integrity sha512-ViAkQ7ed89rmhFIGRsT36njN+97z8+s3XsJnB8E2IKOq+/SLD/6PtSvmTtiwUcVk39qPcjAc/OyeDys4LoJUVg==
+
+todomvc-common@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.npmmirror.com/todomvc-common/-/todomvc-common-1.0.5.tgz#8c3e799ac9f1fc1573e0c204f984510826914730"
+  integrity sha512-D8kEJmxVMQIWwztEdH+WeiAfXRbbSCpgXq4NkYi+gduJ2tr8CNq7sYLfJvjpQ10KD9QxJwig57rvMbV2QAESwQ==
