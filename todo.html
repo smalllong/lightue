@@ -11,6 +11,7 @@
     <script src="node_modules/director/build/director.js"></script>
     <script src="lightue.min.js"></script>
     <script>
+      document.addEventListener('focusin', console.log)
       var L = Lightue,
         STORAGE_KEY = 'todos-lightue',
         S = L.useState({

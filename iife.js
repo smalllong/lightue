@@ -6,7 +6,10 @@ var Lightue = (function () {
     _rendering = false; // executing user render function
 
   function Lightue(data, op = {}) {
-    return new Node({ data: data }, 'data', 'root', document.querySelector(op.el || 'body'))
+    var vm = new Node({ data: data }, 'data', 'root', document.querySelector(op.el || 'body')),
+      toFocus = vm.el.querySelector('[autofocus]');
+    toFocus && toFocus.focus();
+    return vm
   }
   Lightue._abortDep = false; // user can abort dependent update
 
@@ -143,9 +146,9 @@ var Lightue = (function () {
     else new Node(ndata, i, key, this.el);
   };
 
-  Lightue.useState = function (src) {
+  function useState(src, depProxy) {
     if (!isObj(src) || src._ls) return src
-    var deps = {},
+    var deps = depProxy._deps,
       subStates = {},
       depItem;
     function set(src, key, value) {
@@ -158,7 +161,7 @@ var Lightue = (function () {
         // create new state & cache
         src[key] = value;
         if (isObj(value)) {
-          subStates[key] = Lightue.useState(value);
+          subStates[key] = useState(value, depProxy[key]);
           regather = true;
         } else {
           if (Array.isArray(src) && key == 'length') regather = true; // regather deps when arr length changed
@@ -184,13 +187,13 @@ var Lightue = (function () {
           if (key == 'map' && _rendering) {
             return function (callback) {
               var result = src.map((item, i) => {
-                if (isObj(item)) subStates[i] = subStates[i] || Lightue.useState(item);
+                if (isObj(item)) subStates[i] = subStates[i] || useState(item, depProxy[i]);
                 return callback(subStates[i] || item, i)
               });
               result.$mappedFrom = src;
               depItem = extendFunc(depItem, (item, i) => {
                 if (isObj(item)) {
-                  subStates[i] = Lightue.useState(item);
+                  subStates[i] = useState(item, depProxy[i]);
                 }
                 var node = _arrToNode.get(src),
                   newDomSrc,
@@ -212,7 +215,7 @@ var Lightue = (function () {
           if (!deps[key]) deps[key] = new Set();
           _dep && deps[key].add(_dep);
           var result = src[key];
-          if (isObj(result)) subStates[key] = subStates[key] || Lightue.useState(result);
+          if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key]);
 
           return subStates[key] || result
         },
@@ -229,11 +232,26 @@ var Lightue = (function () {
         if (!deps[key]) deps[key] = new Set();
         _dep && deps[key].add(_dep);
         var result = src[key];
-        if (isObj(result)) subStates[key] = subStates[key] || Lightue.useState(result);
+        if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key]);
         return subStates[key] || result
       },
       set: set,
     })
+  }
+
+  Lightue.useState = function (src) {
+    function genDepProxy() {
+      return new Proxy(
+        {},
+        {
+          get: (src, key) => {
+            if (!src[key]) src[key] = key == '_deps' ? new Set() : genDepProxy();
+            return src[key]
+          },
+        }
+      )
+    }
+    return useState(src, genDepProxy())
   };
 
   //methods
