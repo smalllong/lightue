@@ -9,7 +9,7 @@
     "build-browser": "rollup lightue.js --format iife --name 'Lightue' --file iife.js",
     "build-node": "rollup lightue.js --format cjs --file cjs.js",
     "build": "yarn build-browser && yarn build-node && node compress.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -19,9 +19,11 @@
   "license": "MIT",
   "devDependencies": {
     "director": "^1.2.8",
+    "jsdom": "^19.0.0",
     "terser": "^4.6.3",
     "todomvc-app-css": "^2.4.2",
-    "todomvc-common": "^1.0.5"
+    "todomvc-common": "^1.0.5",
+    "vitest": "^0.12.9"
   },
   "files": [
     "lightue.js"

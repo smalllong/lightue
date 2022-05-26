@@ -6,7 +6,7 @@ var Lightue = (function () {
     _rendering = false; // executing user render function
 
   function Lightue(data, op = {}) {
-    var vm = new Node({ data: data }, 'data', 'root', document.querySelector(op.el || 'body')),
+    var vm = new Node({ root: data }, 'root', 'root', document.querySelector(op.el || 'body')),
       toFocus = vm.el.querySelector('[autofocus]');
     toFocus && toFocus.focus();
     return vm
@@ -148,104 +148,91 @@ var Lightue = (function () {
 
   function useState(src, depProxy) {
     if (!isObj(src) || src._ls) return src
-    var deps = depProxy._deps,
+    var deps = depProxy._deps, // get deps from dep proxy tree
       subStates = {},
       depItem;
-    function set(src, key, value) {
-      var regather = false; // is it needed to regather deps
-      if (value && value._ls) {
-        // already a state, just use
-        src[key] = value._target;
-        subStates[key] = value;
-      } else {
-        // create new state & cache
-        src[key] = value;
-        if (isObj(value)) {
-          subStates[key] = useState(value, depProxy[key]);
-          regather = true;
-        } else {
-          if (Array.isArray(src) && key == 'length') regather = true; // regather deps when arr length changed
-          delete subStates[key];
-        }
-      }
-      if (!Lightue._abortDep) {
-        deps[key] && deps[key].forEach((dep) => dep(regather));
-        if (Array.isArray(src)) {
-          key = parseInt(key);
-          key >= 0 && depItem && depItem(value, key);
-        }
-      }
-      return true
-    }
-    if (Array.isArray(src))
-      return new Proxy(src, {
-        get: function (src, key) {
-          if (key == '_ls') return true
-          if (key == '_target') return src
-
-          // When array's 'map' is used to render list, trap it
-          if (key == 'map' && _rendering) {
-            return function (callback) {
-              var result = src.map((item, i) => {
-                if (isObj(item)) subStates[i] = subStates[i] || useState(item, depProxy[i]);
-                return callback(subStates[i] || item, i)
-              });
-              result.$mappedFrom = src;
-              depItem = extendFunc(depItem, (item, i) => {
-                if (isObj(item)) {
-                  subStates[i] = useState(item, depProxy[i]);
-                }
-                var node = _arrToNode.get(src),
-                  newDomSrc,
-                  wrapper = {};
-                _rendering = true;
-                newDomSrc = callback(subStates[i] || item, i);
-                _rendering = false;
-                wrapper[i] = newDomSrc;
-                var newNode = new Node(wrapper, i, hyphenate(node.ndataKey) + '-item');
-                node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd);
-                node.childArrEls[i] && safeRemove(node.childArrEls[i]);
-                node.childArrEls.splice(i, 1, newNode.el);
-              });
-              return result
-            }
-          }
-
-          if (src[key] != null && !src.hasOwnProperty(key)) return src[key]
-          if (!deps[key]) deps[key] = new Set();
-          _dep && deps[key].add(_dep);
-          var result = src[key];
-          if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key]);
-
-          return subStates[key] || result
-        },
-        set: set,
-      })
     return new Proxy(src, {
       get: function (src, key) {
         if (key == '_ls') return true
         if (key == '_target') return src
+
+        // When array's 'map' is used to render list, trap it
+        if (Array.isArray(src) && key == 'map' && _rendering) {
+          return function (callback) {
+            var result = src.map((item, i) => {
+              if (isObj(item)) subStates[i] = subStates[i] || useState(item, depProxy[i]);
+              return callback(subStates[i] || item, i)
+            });
+            result.$mappedFrom = src;
+            depItem = extendFunc(depItem, (item, i) => {
+              if (isObj(item)) {
+                subStates[i] = useState(item, depProxy[i]);
+              }
+              var node = _arrToNode.get(src),
+                newDomSrc,
+                wrapper = {};
+              _rendering = true;
+              newDomSrc = callback(subStates[i] || item, i);
+              _rendering = false;
+              wrapper[i] = newDomSrc;
+              var newNode = new Node(wrapper, i, hyphenate(node.ndataKey) + '-item');
+              node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd);
+              node.childArrEls[i] && safeRemove(node.childArrEls[i]);
+              node.childArrEls.splice(i, 1, newNode.el);
+            });
+            return result
+          }
+        }
+
+        // prototype methods
         if (src[key] != null && !src.hasOwnProperty(key)) {
-          if (typeof src[key] == 'function') return src[key].bind(src)
+          if (!Array.isArray(src) && typeof src[key] == 'function') return src[key].bind(src)
           return src[key]
         }
         if (!deps[key]) deps[key] = new Set();
         _dep && deps[key].add(_dep);
         var result = src[key];
         if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key]);
+
         return subStates[key] || result
       },
-      set: set,
+      set: function (src, key, value) {
+        var regather = false; // is it needed to regather deps
+        if (value && value._ls) {
+          // already a state, just use
+          src[key] = value._target;
+          subStates[key] = value;
+        } else {
+          // create new state & cache
+          src[key] = value;
+          if (isObj(value)) {
+            subStates[key] = useState(value, depProxy[key]);
+            regather = true;
+          } else {
+            if (Array.isArray(src) && key == 'length') regather = true; // regather deps when arr length changed
+            delete subStates[key];
+          }
+        }
+        if (!Lightue._abortDep) {
+          deps[key] && deps[key].forEach((dep) => dep(regather));
+          if (Array.isArray(src)) {
+            key = parseInt(key);
+            key >= 0 && depItem && depItem(value, key);
+          }
+        }
+        return true
+      },
     })
   }
 
   Lightue.useState = function (src) {
+    // dep proxy tree (even if the state subtree changed, deps still kept)
     function genDepProxy() {
       return new Proxy(
         {},
         {
           get: (src, key) => {
-            if (!src[key]) src[key] = key == '_deps' ? new Set() : genDepProxy();
+            if (!src[key]) src[key] = key == '_deps' ? {} : genDepProxy();
             return src[key]
           },
         }
