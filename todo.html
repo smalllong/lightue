@@ -33,9 +33,7 @@
       })
       router.init()
 
-      function saveTodos() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(S.todos))
-      }
+      L.watchEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(S.todos)))
 
       function getFiltered() {
         if (S.visibility == '') return S.todos.filter((todo) => todo.completed || 1)
@@ -45,7 +43,6 @@
 
       function removeTodo(todo) {
         S.todos = S.todos.filter((t) => t != todo)
-        saveTodos()
       }
 
       function doneEdit(todo, value) {
@@ -53,7 +50,6 @@
           S.editedTodo = null
           todo.title = value.trim()
           if (!todo.title) removeTodo(todo)
-          saveTodos()
         }
       }
 
@@ -79,7 +75,6 @@
                     title: newTodo,
                     completed: false,
                   })
-                  saveTodos()
                   e.target.value = ''
                 }
               },
@@ -94,7 +89,6 @@
               onchange: (e) => {
                 var checked = e.target.checked
                 S.todos.forEach((todo) => (todo.completed = checked))
-                saveTodos()
               },
             }),
             $$: L.label({
@@ -115,7 +109,6 @@
                         $checked: () => todo.completed,
                         onchange: (e) => {
                           todo.completed = e.target.checked
-                          saveTodos()
                         },
                       }),
                       todoLabel: L.label({
@@ -164,7 +157,6 @@
             clearCompleted: L.button({
               onclick: (e) => {
                 S.todos = S.todos.filter((todo) => !todo.completed)
-                saveTodos()
               },
               _hidden: () => S.todos.filter((todo) => todo.completed).length == 0,
               $$: 'Clear completed',

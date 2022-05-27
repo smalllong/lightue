@@ -238,6 +238,16 @@ Lightue.useState = function (src) {
   return useState(src, genDepProxy())
 }
 
+// run effect and gather deps for rerun
+Lightue.watchEffect = function (effect) {
+  var runEffect = regather => {
+    regather && (_dep = runEffect)
+    effect()
+    regather && (_dep = null)
+  }
+  runEffect(true)
+}
+
 //methods
 Lightue.for = function (count, generateItem) {
   var arr = []

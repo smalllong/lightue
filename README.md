@@ -18,7 +18,7 @@ A lightweight and simple model-view framework inspired by Vue.js
 
 Use the CDN file and there will be `Lightue` in the global scope
 ```html
-<script src="https://unpkg.com/lightue@0.2.6/lightue.min.js"></script>
+<script src="https://unpkg.com/lightue@0.2.7/lightue.min.js"></script>
 <script src="your_script.js"></script>
 ```
 Or install it ( `yarn add lightue` ) and bundle it using either rollup or webpack
@@ -43,10 +43,14 @@ If you are already familiar with some other FE frameworks, you can learn Lightue
 
 ```js
 // api
+
 var S = Lightue.useState(stateSrc)  // create state using stateSrc
 var vm = Lightue(VDomSrc [, options ])  // options is optional
-
+Lightue.watchEffect(effect)  // setup an effect that reruns when state changed
+```
+```js
 // example
+
 // specify application state
 var S = Lightue.useState({
     text: 'Hello world!'
@@ -64,6 +68,8 @@ var vm = Lightue({
 setTimeout(function() {
     S.text = 'Hello again!'
 }, 2000)
+// pass a state function to watchEffect to save text into localStorage whenever it changes
+Lightue.watchEffect(() => localStorage.setItem('text', S.text))
 ```
 
 As you can see, to create a simple Lightue application, first you need to specify some application states using Lightue.useState(). Then create a Lightue instance using Lightue() function which receives a VDomSrc object as the first parameter (which works as a template).
@@ -114,7 +120,7 @@ The VDomSrc is a special structure used by Lightue to generate VDom(Lightue virt
   - \* (not starts with `$`, `_` or `on`)
     > In other cases when property name does not starts with `$`, `_` or `on`, it will create a child element with a default `div` $tag. And the property name is used as the element class. The value is treated as a VDomSrc
 
-## stateSrc
+## useState(stateSrc)
 
 The stateSrc which passed into Lightue.useState is an object. The `useState` method will turn it into a reactive state. When you reassign a property of it, it will notify the relavant state function to rerender. Here's another example:
 
@@ -166,6 +172,10 @@ setInterval(function () {
 Try the live example here: https://codepen.io/lxl898/pen/vYyooWK and other demos in the demo folder.
 
 That's it. Just modify the state and dependent places will automatically update itself in DOM.
+
+## watchEffect(effect)
+
+The effect is a state function. When calling watchEffect, the effect will be executed immediately. Later when one of the states that used by effect changes, the effect will run again automatically. You can think of these states are being watched for rerunning the effect.
 
 ## Tag & class shortcuts
 
