@@ -103,7 +103,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
             this.childArrEls.forEach(safeRemove)
             this.childArrEls = newEls
           })
-        } else if (i == '$$' && isObj(oValue)) {
+        } else if (isObj(oValue)) {
           this._addChild(o, ndata, i)
         } else if (isPrimitive(oValue)) {
           this.texts[i] = document.createTextNode(oValue)

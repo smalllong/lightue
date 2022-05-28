@@ -75,15 +75,16 @@ function getGuideSidebar(dir) {
       text: 'Introduction',
       children: [
         { text: 'What is Lightue?', link: dir + '/' },
-        { text: 'Getting Started', link: dir + '/guide/getting-started' },
+        { text: 'Install', link: dir + '/guide/install' },
       ],
     },
-    // {
-    //   text: 'Advanced',
-    //   children: [
-    //     { text: 'Frontmatter', link: dir + '/guide/frontmatter' },
-    //   ],
-    // },
+    {
+      text: 'Essentials',
+      children: [
+        { text: 'Getting Started', link: dir + '/guide/getting-started' },
+        { text: 'Template Syntax', link: dir + '/guide/template-syntax' },
+      ],
+    },
   ]
 }
 
