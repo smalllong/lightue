@@ -13,7 +13,7 @@ When calling a new Lightue, there can be an optional `options` object as a secon
 
 ## useState(stateSrc)
 
-The stateSrc which passed into Lightue.useState is an object. The `useState` method will turn it into a reactive state. When you reassign a property of it, it will notify the relavant state function to rerender. Here's another example:
+The stateSrc which passed into Lightue.useState is an object. The `useState` method will turn it into a reactive state. When you reassign a property of it, it will notify the relavant state function to rerender. Here's an example:
 
 ```js
 var S = Lightue.useState({

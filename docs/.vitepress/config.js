@@ -7,12 +7,12 @@ export default defineConfig({
     '/': {
       lang: 'en-US',
       title: 'Lightue',
-      description: 'A lightweight and simple model-view framework inspired by Vue.js',
+      description: 'A lightweight and simple web frontend model-view framework inspired by Vue.js',
     },
     '/zh/': {
       lang: 'zh-CN',
       title: 'Lightue',
-      description: '一个启发自Vue.js的轻量简单的状态视图框架',
+      description: '一个启发自Vue.js的轻量简单的web前端框架',
     },
   },
 
@@ -51,18 +51,18 @@ export default defineConfig({
         editLinkText: '在 GitHub 上编辑此页',
         lastUpdated: '上次更新',
         nav: [
-          { text: '教程', link: '/', activeMatch: '^/$|^/guide/' },
+          { text: '教程', link: '/zh/', activeMatch: '^/zh/$|^/zh/guide/' },
           {
             text: 'API',
-            link: '/api/global',
-            activeMatch: '^/api/',
+            link: '/zh/api/global',
+            activeMatch: '^/zh/api/',
           },
         ],
 
         sidebar: {
-          '/guide/': getGuideSidebar('/zh'),
-          '/api/': getAPISidebar('/zh'),
-          '/': getGuideSidebar('/zh'),
+          '/zh/guide/': getGuideSidebar('/zh'),
+          '/zh/api/': getAPISidebar('/zh'),
+          '/zh/': getGuideSidebar('/zh'),
         },
       },
     },
@@ -70,36 +70,59 @@ export default defineConfig({
 })
 
 function getGuideSidebar(dir) {
-  return [
-    {
-      text: 'Introduction',
-      children: [
-        { text: 'What is Lightue?', link: dir + '/' },
-        { text: 'Install', link: dir + '/guide/install' },
-      ],
-    },
-    {
-      text: 'Essentials',
-      children: [
-        { text: 'Getting Started', link: dir + '/guide/getting-started' },
-        { text: 'Template Syntax', link: dir + '/guide/template-syntax' },
-      ],
-    },
-  ]
+  return dir == ''
+    ? [
+        {
+          text: 'Introduction',
+          children: [
+            { text: 'What is Lightue?', link: dir + '/' },
+            { text: 'Install', link: dir + '/guide/install' },
+          ],
+        },
+        {
+          text: 'Essentials',
+          children: [
+            { text: 'Getting Started', link: dir + '/guide/getting-started' },
+            { text: 'Template Syntax', link: dir + '/guide/template-syntax' },
+          ],
+        },
+      ]
+    : [
+        {
+          text: '介绍',
+          children: [
+            { text: 'Lightue是什么?', link: dir + '/' },
+            { text: '安装', link: dir + '/guide/install' },
+          ],
+        },
+        {
+          text: '基础',
+          children: [
+            { text: '开始上手', link: dir + '/guide/getting-started' },
+            { text: '模板语法', link: dir + '/guide/template-syntax' },
+          ],
+        },
+      ]
 }
 
 function getAPISidebar(dir) {
-  return [
-    {
-      text: 'API',
-      children: [
-        { text: 'Global methods', link: dir + '/api/global' },
-        { text: 'VDomSrc', link: dir + '/api/template' },
-      ],
-    },
-    // {
-    //   text: 'Theme Config',
-    //   children: [{ text: 'Homepage', link: dir + '/config/homepage' }],
-    // },
-  ]
+  return dir == ''
+    ? [
+        {
+          text: 'API',
+          children: [
+            { text: 'Global methods', link: dir + '/api/global' },
+            { text: 'VDomSrc', link: dir + '/api/template' },
+          ],
+        },
+      ]
+    : [
+        {
+          text: 'API',
+          children: [
+            { text: '全局方法', link: dir + '/api/global' },
+            { text: 'VDomSrc', link: dir + '/api/template' },
+          ],
+        },
+      ]
 }
