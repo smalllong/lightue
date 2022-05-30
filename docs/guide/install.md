@@ -1,11 +1,12 @@
+<script setup>
+import packageJson from '../../package.json'
+</script>
+
 # Install
 
-Use the CDN file and there will be `Lightue` in the global scope
+Use the CDN file and there will be `Lightue` in the global scope:
 
-```html
-<script src="https://unpkg.com/lightue@0.2.7/lightue.min.js"></script>
-<script src="your_script.js"></script>
-```
+`<script src="https://unpkg.com/lightue@{{packageJson.version}}/dist/lightue.min.js"></script>`
 
 Or install it ( `yarn add lightue` ) and bundle it using either rollup or webpack
 
