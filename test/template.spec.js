@@ -1,5 +1,4 @@
-import L from 'lightue'
-import { describe, expect, it } from 'vitest'
+var L = require('../dist/cjs')
 
 describe('template', () => {
   it('create root element', () => {
@@ -17,8 +16,8 @@ describe('template', () => {
         barBaz: '123',
       },
       $$: {
-        $$: 345
-      }
+        $$: 345,
+      },
     })
     expect(vm.el.children[0].outerHTML).toBe('<div class="hi">hello</div>')
     expect(vm.el.children[1].outerHTML).toBe('<div class="foo"><div class="bar-baz">123</div></div>')
@@ -57,19 +56,17 @@ describe('template', () => {
   it('$class', () => {
     var vm = L({
       aaa: {
-        $class: {foo: 1, bar: 0},
-        $$: 'bbb'
+        $class: { foo: 1, bar: 0 },
+        $$: 'bbb',
       },
     })
-    expect(vm.el.innerHTML).toBe(
-      '<div class="aaa foo">bbb</div>'
-    )
+    expect(vm.el.innerHTML).toBe('<div class="aaa foo">bbb</div>')
   })
 
   it('$value', () => {
     var vm = L({
       aaa: L.input({
-        $value: 'hello'
+        $value: 'hello',
       }),
     })
     expect(vm.el.children[0].value).toBe('hello')

@@ -12,7 +12,7 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs",
-    "test": "vitest"
+    "test": "jest --env=jsdom"
   },
   "repository": {
     "type": "git",
@@ -22,12 +22,12 @@
   "license": "MIT",
   "devDependencies": {
     "director": "^1.2.8",
-    "jsdom": "^19.0.0",
+    "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
     "terser": "^4.6.3",
     "todomvc-app-css": "^2.4.2",
     "todomvc-common": "^1.0.5",
-    "vitepress": "^0.22.4",
-    "vitest": "^0.12.9"
+    "vitepress": "^0.22.4"
   },
   "files": [
     "lightue.js",

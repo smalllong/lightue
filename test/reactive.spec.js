@@ -1,5 +1,4 @@
-import L from 'lightue'
-import { describe, expect, it } from 'vitest'
+var L = require('../dist/cjs')
 
 describe('reactive', () => {
   it('watchEffect', () => {
