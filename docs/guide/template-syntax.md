@@ -59,7 +59,7 @@ will output:
 ```
 As you can see, in this case the simple `$$` only object can't be abbreviated. Also I suggest to always set a key (class) so it can be more specific.
 
-## Attributes
+## Attributes & Classes
 
 To set attributes on elements, use properties starts with `_`:
 ```js
@@ -73,6 +73,33 @@ will output:
 ```html
 <div class="foo" hidden="true" data-test="some data">
   you can't see me
+</div>
+```
+
+To set element classes, use either `_class`(will override key class) or `$class`(object style):
+```js
+  foo: {
+    _class: 'bar',
+    $$: '123',
+  },
+```
+will output:
+```html
+<div class="bar">
+  123
+</div>
+```
+and:
+```js
+  foo: {
+    $class: {bar: 1},
+    $$: '123',
+  },
+```
+will output:
+```html
+<div class="foo bar">
+  123
 </div>
 ```
 

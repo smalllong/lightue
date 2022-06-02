@@ -84,6 +84,7 @@ function getGuideSidebar(dir) {
           children: [
             { text: 'Getting Started', link: dir + '/guide/getting-started' },
             { text: 'Template Syntax', link: dir + '/guide/template-syntax' },
+            { text: 'State Driven', link: dir + '/guide/state' },
           ],
         },
       ]
@@ -100,6 +101,7 @@ function getGuideSidebar(dir) {
           children: [
             { text: '开始上手', link: dir + '/guide/getting-started' },
             { text: '模板语法', link: dir + '/guide/template-syntax' },
+            { text: '状态驱动', link: dir + '/guide/state' },
           ],
         },
       ]

@@ -59,7 +59,7 @@ $$: {
 ```
 可以看到，这种情况下只有 `$$` 属性的对象无法简写。另外我建议始终设置一个键（类名）这样代码可以更加清晰。
 
-## 属性
+## 属性 & 类
 
 要设置HTML元素的属性，需要在对象中使用 `_` 开头的属性：
 ```js
@@ -73,6 +73,33 @@ $$: {
 ```html
 <div class="foo" hidden="true" data-test="some data">
   you can't see me
+</div>
+```
+
+要设置元素的类，使用 `_class`（会覆盖键的类）或 `$class`（对象形式）：
+```js
+  foo: {
+    _class: 'bar',
+    $$: '123',
+  },
+```
+将输出：
+```html
+<div class="bar">
+  123
+</div>
+```
+以及：
+```js
+  foo: {
+    $class: {bar: 1},
+    $$: '123',
+  },
+```
+将输出：
+```html
+<div class="foo bar">
+  123
 </div>
 ```
 
