@@ -8,7 +8,7 @@
   "scripts": {
     "build-browser": "rollup lightue.js --format iife --name 'Lightue' --file dist/iife.js",
     "build-node": "rollup lightue.js --format cjs --file dist/cjs.js",
-    "build": "yarn build-browser && yarn build-node && node compress.js",
+    "build": "yarn build-browser && yarn build-node && terser dist/iife.js -o dist/lightue.min.js",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs",
@@ -24,7 +24,6 @@
     "director": "^1.2.8",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
-    "terser": "^4.6.3",
     "todomvc-app-css": "^2.4.2",
     "todomvc-common": "^1.0.5",
     "vitepress": "^0.22.4"
