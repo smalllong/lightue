@@ -9,7 +9,7 @@ describe('template', () => {
     expect(vm.el.outerHTML).toBe('<div class="root">hello world</div>')
   })
 
-  it('create child element', () => {
+  it('create child elements', () => {
     var vm = L({
       hi: 'hello',
       foo: {
@@ -18,10 +18,16 @@ describe('template', () => {
       $$: {
         $$: 345,
       },
+      $$1: {
+        $tag: 'section',
+      },
+      $$2: 'yes',
     })
     expect(vm.el.children[0].outerHTML).toBe('<div class="hi">hello</div>')
     expect(vm.el.children[1].outerHTML).toBe('<div class="foo"><div class="bar-baz">123</div></div>')
     expect(vm.el.children[2].outerHTML).toBe('<div>345</div>')
+    expect(vm.el.children[3].outerHTML).toBe('<section></section>')
+    expect(vm.el.childNodes[4].wholeText).toBe('yes')
   })
 
   it('create child span element', () => {
@@ -70,5 +76,62 @@ describe('template', () => {
       }),
     })
     expect(vm.el.children[0].value).toBe('hello')
+  })
+
+  it('$checked', () => {
+    var vm = L({
+      aaa: L.input({
+        _type: 'checkbox',
+        $checked: 1,
+      }),
+    })
+    expect(vm.el.children[0].checked).toBe(true)
+  })
+
+  it('attributes', () => {
+    var vm = L({
+      aaa: L.input({
+        $tag: 'input',
+        _type: 'checkbox',
+        _dataFoo: 'bar',
+      }),
+    })
+    expect(vm.el.children[0].outerHTML).toBe('<input class="aaa" type="checkbox" data-foo="bar">')
+  })
+
+  it('listener', () => {
+    var flag = false,
+      handler = (e) => {
+        flag = true
+      }
+    var vm = L({
+      onclick: handler,
+    })
+    vm.el.dispatchEvent(new MouseEvent('click'))
+    expect(flag).toBe(true)
+  })
+
+  it('$cleanup', () => {
+    var cleaned = false,
+      S = L.useState({
+        curComp: 0,
+      })
+    function comp1() {
+      return {
+        $cleanup: () => (cleaned = true),
+      }
+    }
+    function comp2() {
+      return {}
+    }
+    var comps = [comp1, comp2]
+    var vm = L({
+      dynamicComp: () => comps[S.curComp](),
+    })
+    setTimeout(() => {
+      expect(cleaned).toBe(false)
+      S.curComp = 1
+      setTimeout(() => expect(cleaned).toBe(true))
+    })
   })
 })
