@@ -30,6 +30,28 @@ describe('template', () => {
     expect(vm.el.childNodes[4].wholeText).toBe('yes')
   })
 
+  it('not create null or undefined', () => {
+    var vm = L({
+      foo: null,
+      bar: undefined,
+    })
+    expect(vm.el.outerHTML).toBe('<div class="root"></div>')
+  })
+
+  it('not show $if', () => {
+    var vm = L({
+      foo: {
+        $if: false,
+        $$: 'bar',
+      },
+      aaa: {
+        $if: true,
+        $$: 'bbb',
+      },
+    })
+    expect(vm.el.innerHTML).toBe('<!--foo--><div class="aaa">bbb</div>')
+  })
+
   it('create child span element', () => {
     var vm = L({
       $_hi: 'hello',

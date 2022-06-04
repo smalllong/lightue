@@ -14,6 +14,10 @@ This will generate a wrapper element. Each item in the array is parsed as a VDom
 
 This is the most crucial part of the VDomSrc structure. It will be rendered to a DOM element, and it has some special keys that are handled specially:
 
+### $if (boolean)
+
+This specifies whether to put the element into DOM. When the value is false, element will be stashed and replaced by a Comment.
+
 ### $class (object)
 
 This specifies classes of the current element. The key is the class name, and the value is boolean indicating whether to add the class

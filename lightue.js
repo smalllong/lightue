@@ -81,6 +81,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.el.VNode = this
   for (var i in ndata) {
     var o = ndata[i]
+    if (o == null) continue
     if (i[0] == '$') {
       //lightue directives
       if (i.slice(0, 2) == '$$') {
@@ -113,6 +114,20 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
       } else if (i.slice(0, 2) == '$_') {
         //span element shortcut
         new Node(ndata, i, hyphenate(i.slice(2)), this.el)
+      } else if (i == '$if') {
+        // conditionally switch between elem and its placeholder
+        mapDom(ndata, i, this.el, (el, v) => {
+          if (!this.placeholder) this.placeholder = new Comment(key)
+          if (v && this.isStashed) {
+            this.placeholder.parentNode.insertBefore(this.el, this.placeholder)
+            this.placeholder.remove()
+            this.isStashed = false
+          } else if (!v && !this.isStashed) {
+            this.el.parentNode.insertBefore(this.placeholder, this.el)
+            this.el.remove()
+            this.isStashed = true
+          }
+        })
       } else if (i == '$class') {
         Object.keys(o).forEach((j) => {
           mapDom(o, j, this.el, function (el, v) {
@@ -240,7 +255,7 @@ Lightue.useState = function (src) {
 
 // run effect and gather deps for rerun
 Lightue.watchEffect = function (effect) {
-  var runEffect = regather => {
+  var runEffect = (regather) => {
     regather && (_dep = runEffect)
     effect()
     regather && (_dep = null)

@@ -42,6 +42,33 @@ describe('reactive', () => {
     expect(vm.el.textContent).toBe('999888777')
   })
 
+  it('conditionally render', () => {
+    var S = L.useState({
+      showElem: true,
+      content: '111',
+      showBaz: false,
+    })
+    var vm = L({
+      foo: {
+        $if: () => S.showElem,
+        $$: () => S.content,
+      },
+      bar: '333',
+      baz: {
+        $if: () => S.showBaz,
+        $$: 'aaa',
+      }
+    })
+    expect(vm.el.innerHTML).toBe('<div class="foo">111</div><div class="bar">333</div><!--baz-->')
+    S.showElem = false
+    expect(vm.el.innerHTML).toBe('<!--foo--><div class="bar">333</div><!--baz-->')
+    S.content = '222'
+    S.showElem = true
+    expect(vm.el.innerHTML).toBe('<div class="foo">222</div><div class="bar">333</div><!--baz-->')
+    S.showBaz = true
+    expect(vm.el.innerHTML).toBe('<div class="foo">222</div><div class="bar">333</div><div class="baz">aaa</div>')
+  })
+
   it('watchEffect', () => {
     var S = L.useState({
         foo: 'bar',
