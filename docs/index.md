@@ -27,6 +27,6 @@ If you are already familiar with some other FE frameworks, you can learn Lightue
 
 ## Projects that are using Lightue
 
-https://github.com/smalllong/lightuepress
+https://github.com/smalllong/lightuepress (which is powering this site)
 
 https://github.com/smalllong/json5-sheet-editor
