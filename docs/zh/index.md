@@ -27,4 +27,6 @@ Lightue支持IE外的其他现代浏览器。
 
 ## 使用Lightue的项目
 
+https://github.com/smalllong/lightuepress
+
 https://github.com/smalllong/json5-sheet-editor
