@@ -16,7 +16,7 @@ This is the most crucial part of the VDomSrc structure. It will be rendered to a
 
 ### $if (boolean)
 
-This specifies whether to put the element into DOM. When the value is false, element will be stashed and replaced by a Comment.
+This specifies whether to put the element into DOM. When the value is falsy, element will be stashed and replaced by a Comment.
 
 ### $class (object)
 

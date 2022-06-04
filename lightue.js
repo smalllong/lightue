@@ -16,7 +16,6 @@ function hyphenate(str) {
 
 // elKey can be a custom setting function
 function mapDom(obj, key, el, elKey) {
-  if (obj[key] == null) return
   var getter
   typeof obj[key] == 'function' && (getter = obj[key])
   function updateDom(regather) {
@@ -81,7 +80,8 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.el.VNode = this
   for (var i in ndata) {
     var o = ndata[i]
-    if (o == null) continue
+    // skip handle null and undefined, but for boolean properties, treat them falsy
+    if (i!='$if' && i!='$checked' && o == null) continue
     if (i[0] == '$') {
       //lightue directives
       if (i.slice(0, 2) == '$$') {

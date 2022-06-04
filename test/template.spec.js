@@ -44,12 +44,16 @@ describe('template', () => {
         $if: false,
         $$: 'bar',
       },
+      undefined: {
+        $if: undefined,
+        $$: 'should not be in DOM',
+      },
       aaa: {
         $if: true,
         $$: 'bbb',
       },
     })
-    expect(vm.el.innerHTML).toBe('<!--foo--><div class="aaa">bbb</div>')
+    expect(vm.el.innerHTML).toBe('<!--foo--><!--undefined--><div class="aaa">bbb</div>')
   })
 
   it('create child span element', () => {

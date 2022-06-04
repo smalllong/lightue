@@ -16,7 +16,7 @@ VDomSrc 是 Lightue 使用来生成 VDom 和真实 DOM 节点的一种特殊结�
 
 ### $if (boolean)
 
-声明是否将元素放入 DOM。当为 false 时，元素会被移出 DOM 并暂存，替换为一个注释节点。
+声明是否将元素放入 DOM。当为 falsy 时，元素会被移出 DOM 并暂存，替换为一个注释节点。
 
 ### $class (object)
 
