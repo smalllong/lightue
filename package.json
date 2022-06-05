@@ -1,6 +1,6 @@
 {
   "name": "lightue",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
   "browser": "dist/cjs.js",
   "module": "lightue.js",
