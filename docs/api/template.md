@@ -38,30 +38,30 @@ For input elements whose type is checkbox or radio, `$checked` will set their ch
 
 Sets the function which will be called when the element is about to be removed from document. Usually contains something like `clearInterval`
 
-### \$$(Array)
+### $$ (Array)
 
 When there is a `$$` property and it's value is of type Array, each item in the array is parsed as a VDomSrc and the results are appended in current element one by one
 
-### \$$\*(Object)
+### $$* (Object)
 
 When there is a property starts with `$$` and it's value is of type Object, it will be treated as a VDomSrc and the result will append in current element
 
-### \$$\* (string | number)
+### $$* (string | number)
 
 When there is a property starts with `$$` and the value is of type `string | number` it will be rendered to a text node
 
-### \$\_\*
+### $_*
 
 When the property name starts with `$_`, it means to create a child element with a default `span` $tag. And the following \* in the property name is used as the element class. The value is treated as a VDomSrc
 
-### \_\*
+### _*
 
 When a property starts with `_`, it's value will be assigned to the hyphenated version attribute. For example, `_dataSrc` property assigned to `data-src` attribute
 
-### on\*
+### on*
 
 This is the event listener on the element. It will be added to the element using native `addEventListener`.
 
-### \* (not starts with `$`, `_` or `on`)
+### * (not starts with `$`, `_` or `on`)
 
 In other cases when property name does not starts with `$`, `_` or `on`, it will create a child element with a default `div` $tag. And the hyphenated version property name is used as the element class. The value is treated as a VDomSrc

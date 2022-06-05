@@ -2,7 +2,7 @@
 
 ## Lightue(VDomSrc [, options ])
 
-The `Lightue` itself is a function accepts [VDomSrc](template) and options. When being called, it will parse the VDomSrc and create the Lightue Node tree according to VDomSrc, generate corresponding DOM elements, and append the generated DOM tree to document's body or other places specified by `el` option.
+The `Lightue` itself is a function accepts [VDomSrc](./template) and options. When being called, it will parse the VDomSrc and create the Lightue Node tree according to VDomSrc, generate corresponding DOM elements, and append the generated DOM tree to document's body or other places specified by `el` option.
 
 ### options
 

@@ -2,7 +2,7 @@
 
 ## Lightue(VDomSrc [, options ])
 
-`Lightue` 自己是一个接收[VDomSrc](template)和 options 选项的函数。当调用时，它会解析 VDomSrc 并创建 Lightue 节点树，同时生成相应的 DOM 元素，然后将生成的 DOM 树插入到 body 或[el](../api/global#options)选项指定的其他元素末尾。
+`Lightue` 自己是一个接收[VDomSrc](./template)和 options 选项的函数。当调用时，它会解析 VDomSrc 并创建 Lightue 节点树，同时生成相应的 DOM 元素，然后将生成的 DOM 树插入到 body 或[el](../api/global#options)选项指定的其他元素末尾。
 
 ### options
 
