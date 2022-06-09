@@ -9,7 +9,7 @@ The `Lightue` itself is a function accepts [VDomSrc](./template) and options. Wh
 When calling a new Lightue, there can be an optional `options` object as a second parameter. Currently, there is only one option:
 
 - el (string, optional)
-  > When there is an `el` option, it specifies the mount point of the current Lightue. The value will be passed to `document.querySelector` then Lightue will append the generated DOM to this element. The default value is 'body'
+When there is an `el` option, it specifies the mount point of the current Lightue. The value will be passed to `document.querySelector` then Lightue will append the generated DOM to this element. The default value is 'body'
 
 ## useState(stateSrc)
 

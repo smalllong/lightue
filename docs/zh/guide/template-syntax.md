@@ -131,4 +131,4 @@ $$: {
 </ul>
 ```
 
-现在你已经掌握使用VDomSrc的基础。接下来可以在[标签&类简写](../api/global#标签-类简写)和[VDomSrc的API](../api/template)查看更多信息。
+现在你已经掌握使用VDomSrc的基础。接下来可以在[标签&类简写](../api/global#标签&类简写)和[VDomSrc的API](../api/template)查看更多信息。

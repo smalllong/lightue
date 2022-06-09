@@ -13,7 +13,7 @@ var vm = Lightue(VDomSrc [, options ])  // options is optional
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
 
-As you can see, to create a simple Lightue application, first you need to specify some application states using [Lightue.useState()](../api/global#usestate-statesrc). Then create a Lightue instance using [Lightue()](../api/global) function which receives a [VDomSrc](../api/template) object as the first parameter (which works as a template).
+As you can see, to create a simple Lightue application, first you need to specify some application states using [Lightue.useState()](../api/global#useState-stateSrc-). Then create a Lightue instance using [Lightue()](../api/global) function which receives a [VDomSrc](../api/template) object as the first parameter (which works as a template).
 
 At this time you'll be able to see the rendered result in browser. And when you change state, the rendered DOM will be updated. In the above example, we showed a single line text and changed it 2 seconds later.
 

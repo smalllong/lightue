@@ -4,7 +4,7 @@ Lightue应用的DOM由状态驱动。当状态改变时，相应的DOM也会变�
 
 ## 创建状态
 
-要创建一个状态，需要传一个对象给 [Lightue.useState](../api/global#usestate-statesrc)：
+要创建一个状态，需要传一个对象给 [Lightue.useState](../api/global#useState-stateSrc-)：
 
 ```js
 var S = Lightue.useState({

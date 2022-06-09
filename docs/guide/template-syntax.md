@@ -132,4 +132,4 @@ will output:
 ```
 
 
-Now you know the basics of using VDomSrc. Check out for more in [Tag & class shortcuts](../api/global#tag-class-shortcuts) and [API of VDomSrc](../api/template)
+Now you know the basics of using VDomSrc. Check out for more in [Tag & class shortcuts](../api/global#Tag & class shortcuts) and [API of VDomSrc](../api/template)

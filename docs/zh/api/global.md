@@ -9,7 +9,7 @@
 当调用 Lightue 时，可以传入一个可选的 options 对象作为第二个参数。目前它只含有一个选项：
 
 - el (string, optional)
-  > 当传入一个 `el` 选项时，它声明了当前 Lightue 的挂载点。这个值会传给 `document.querySelector` 然后 Lightue 会将生成的 DOM 插入到此节点末尾。默认值为 'body'
+当传入一个 `el` 选项时，它声明了当前 Lightue 的挂载点。这个值会传给 `document.querySelector` 然后 Lightue 会将生成的 DOM 插入到此节点末尾。默认值为 'body'
 
 ## useState(stateSrc)
 

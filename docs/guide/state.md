@@ -4,7 +4,7 @@ Lightue apps' DOMs are driven by states. When state changed, corresponding DOM w
 
 ## Create states
 
-To create a state, pass an object to [Lightue.useState](../api/global#usestate-statesrc):
+To create a state, pass an object to [Lightue.useState](../api/global#useState-stateSrc-):
 
 ```js
 var S = Lightue.useState({

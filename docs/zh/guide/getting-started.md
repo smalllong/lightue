@@ -13,7 +13,7 @@ var vm = Lightue(VDomSrc [, options ])  // options is optional
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
 
-你已经看到，要创建一个简单的Lightue应用，首先你需要使用[Lightue.useState()](../api/global#usestate-statesrc)声明一些应用状态。然后用[Lightue()](../api/global)函数接收一个[VDomSrc](../api/template)作为模板来创建一个应用实例。
+你已经看到，要创建一个简单的Lightue应用，首先你需要使用[Lightue.useState()](../api/global#useState-stateSrc-)声明一些应用状态。然后用[Lightue()](../api/global)函数接收一个[VDomSrc](../api/template)作为模板来创建一个应用实例。
 
 这时你已经可以在浏览器中看到渲染结果。当你改变状态时，渲染的DOM将会自动更新。在上面的例子中，我们展示了一行文字并在2秒后改变了它。
 
