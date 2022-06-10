@@ -5,26 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lightue</title>
-    <style>
-      .nav-bar {
-        background-color: rgba(0, 0, 0, 0.3);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-      }
-
-      .nav-bar-title {
-        color: var(--c-brand);
-        font-size: 2rem;
-        text-shadow: 0 0 4px var(--c-brand);
-      }
-
-      .sidebar-link-item.active {
-        text-shadow: 0 0 4px var(--c-brand);
-      }
-    </style>
   </head>
   <body>
-    <script src="https://unpkg.com/lightuepress@0.0.8/dist/lightuepress.min.js"></script>
+    <script src="https://unpkg.com/lightuepress@0.0.9/dist/lightuepress.min.js"></script>
     <script>
       if (location.hash == '') location.hash = navigator.language.slice(0, 2) == 'zh' ? '#/zh/' : '#/'
       Lightuepress({
@@ -100,6 +83,7 @@
                   { text: 'Getting Started', link: '/guide/getting-started' },
                   { text: 'Template Syntax', link: '/guide/template-syntax' },
                   { text: 'State Driven', link: '/guide/state' },
+                  { text: 'Conditional Rendering', link: '/guide/conditional' },
                 ],
               },
             ]
@@ -117,6 +101,7 @@
                   { text: '开始上手', link: '/guide/getting-started' },
                   { text: '模板语法', link: '/guide/template-syntax' },
                   { text: '状态驱动', link: '/guide/state' },
+                  { text: '条件渲染', link: '/guide/conditional' },
                 ],
               },
             ]
