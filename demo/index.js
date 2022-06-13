@@ -222,6 +222,36 @@ function DemoForm() {
   }
 }
 
+function DemoComp() {
+  var S = L.useState({
+    aaa: 123,
+    bbb: {
+      ccc: '345',
+    },
+  })
+
+  function Btn(text, onclick) {
+    return {
+      desc: () => 'component received param text: ' + text,
+      btn: L.button({
+        _type: 'button',
+        $$: text,
+        onclick: onclick,
+      }),
+    }
+  }
+
+  return {
+    states: {
+      $$: 'parent states:',
+      aaa: () => 'aaa: ' + S.aaa,
+      bbbccc: () => 'bbb.ccc: ' + S.bbb.ccc,
+    },
+    btn1: Btn(S.$aaa, () => (S.aaa += 4)),
+    btn2: Btn(S.bbb.$ccc, () => (S.bbb.ccc += 5)),
+  }
+}
+
 function showDemo(e) {
   S.curDemo = this.value
 }
@@ -243,7 +273,7 @@ function DemoRadio(index, name, checked) {
   }
 }
 
-var demos = [DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio, DemoList, DemoForm]
+var demos = [DemoComp, DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio, DemoList, DemoForm]
 
 var vm = L({
   selectDemo: demos.map(function (demo, i) {

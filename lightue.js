@@ -1,4 +1,4 @@
-var _dep = null,
+var _dep = [],
   _arrToNode = new WeakMap(),
   _rendering = false // executing user render function
 
@@ -19,12 +19,12 @@ function mapDom(obj, key, el, elKey) {
   var getter
   typeof obj[key] == 'function' && (getter = obj[key])
   function updateDom(regather) {
-    if (regather && getter) _dep = updateDom
+    if (regather && getter) _dep.push(updateDom)
     _rendering = true
     var v = getter ? getter() : obj[key]
     _rendering = false
     typeof elKey == 'function' ? elKey(el, v) : (el[elKey] = v)
-    if (regather && getter) _dep = null
+    if (regather && getter) _dep.pop()
   }
   updateDom(true)
 }
@@ -81,11 +81,14 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   for (var i in ndata) {
     var o = ndata[i]
     // skip handle null and undefined, but for boolean properties, treat them falsy
-    if (i!='$if' && i!='$checked' && o == null) continue
+    if (i != '$if' && i != '$checked' && o == null) continue
     if (i[0] == '$') {
       //lightue directives
       if (i.slice(0, 2) == '$$') {
+        var _depStashed = _dep
+        _dep = [] // avoid gather deps when getting oValue
         var oValue = typeof o == 'function' ? o() : o
+        _dep = _depStashed
         if (i == '$$' && Array.isArray(oValue)) {
           this.arrStart = new Comment('arr start')
           this.arrEnd = new Comment('arr end')
@@ -113,7 +116,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
         }
       } else if (i.slice(0, 2) == '$_') {
         //span element shortcut
-        new Node(ndata, i, hyphenate(i.slice(2)), this.el)
+        this._addChild(o, ndata, i, hyphenate(i.slice(2)))
       } else if (i == '$if') {
         // conditionally switch between elem and its placeholder
         mapDom(ndata, i, this.el, (el, v) => {
@@ -167,6 +170,11 @@ function useState(src, depProxy) {
     get: function (src, key) {
       if (key == '_ls') return true
       if (key == '_target') return src
+      if (typeof key == 'string' && key[0] == '$') {
+        var result = () => this.get(src, key.slice(1))
+        result.toString = result
+        return result
+      }
 
       // When array's 'map' is used to render list, trap it
       if (Array.isArray(src) && key == 'map' && _rendering) {
@@ -202,7 +210,7 @@ function useState(src, depProxy) {
         return src[key]
       }
       if (!deps[key]) deps[key] = new Set()
-      _dep && deps[key].add(_dep)
+      _dep.length && deps[key].add(_dep[_dep.length - 1])
       var result = src[key]
       if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key])
 
@@ -256,9 +264,9 @@ Lightue.useState = function (src) {
 // run effect and gather deps for rerun
 Lightue.watchEffect = function (effect) {
   var runEffect = (regather) => {
-    regather && (_dep = runEffect)
+    regather && _dep.push(runEffect)
     effect()
-    regather && (_dep = null)
+    regather && _dep.pop()
   }
   runEffect(true)
 }

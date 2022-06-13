@@ -83,4 +83,17 @@ describe('reactive', () => {
     S.foo = '234'
     expect(temp).toBe(3)
   })
+
+  it('state function shortcut', () => {
+    var S = L.useState({
+      foo: 'bar'
+    })
+    var vm = L({
+      aaa: S.$foo,
+      ccc: () => S.$foo + 'ddd',
+    })
+    expect(vm.el.innerHTML).toBe('<div class="aaa">bar</div><div class="ccc">barddd</div>')
+    S.foo = 'bbb'
+    expect(vm.el.innerHTML).toBe('<div class="aaa">bbb</div><div class="ccc">bbbddd</div>')
+  })
 })

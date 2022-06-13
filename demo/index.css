@@ -39,6 +39,11 @@ html, body {
   overflow: auto;
 }
 
+button {
+  margin: .5rem;
+  padding: 1rem;
+}
+
 .week-title {
   background-color: rgba(192, 192, 192, 0.7);
   position: absolute;
