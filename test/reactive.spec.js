@@ -22,18 +22,24 @@ describe('reactive', () => {
 
   it('array state changed', () => {
     var S = L.useState({
-      list: [2, 3, 5, 7],
-    })
+        list: [2, 3, 5, 7],
+      }),
+      renderCount = 0
 
     var vm = L({
-      list: () => S.list,
+      list: () => {
+        renderCount++
+        return S.list
+      },
     })
 
     expect(vm.el.children[0].children.length).toBe(4)
     expect(vm.el.textContent).toBe('2357')
+    expect(renderCount).toBe(2)
     S.list.push(11)
     expect(vm.el.children[0].children.length).toBe(5)
     expect(vm.el.textContent).toBe('235711')
+    expect(renderCount).toBe(6) // currently there are too many rerenders, need optimization later
     S.list[2] = 432
     expect(vm.el.children[0].children.length).toBe(5)
     expect(vm.el.textContent).toBe('23432711')
@@ -57,7 +63,7 @@ describe('reactive', () => {
       baz: {
         $if: () => S.showBaz,
         $$: 'aaa',
-      }
+      },
     })
     expect(vm.el.innerHTML).toBe('<div class="foo">111</div><div class="bar">333</div><!--baz-->')
     S.showElem = false
@@ -86,7 +92,7 @@ describe('reactive', () => {
 
   it('state function shortcut', () => {
     var S = L.useState({
-      foo: 'bar'
+      foo: 'bar',
     })
     var vm = L({
       aaa: S.$foo,
@@ -95,5 +101,37 @@ describe('reactive', () => {
     expect(vm.el.innerHTML).toBe('<div class="aaa">bar</div><div class="ccc">barddd</div>')
     S.foo = 'bbb'
     expect(vm.el.innerHTML).toBe('<div class="aaa">bbb</div><div class="ccc">bbbddd</div>')
+  })
+
+  it('nested state function', () => {
+    var S = L.useState({
+        a: 2,
+        b: 'foo',
+        c: 'cc',
+      }),
+      renderCount = 0
+
+    var vm = L({
+      dynamic: () => {
+        renderCount++
+        return {
+          $tag: 'h' + S.a,
+          bar: () => S.b,
+          $$: S.c,
+        }
+      },
+    })
+
+    expect(vm.el.innerHTML).toBe('<h2 class="dynamic"><div class="bar">foo</div>cc</h2>')
+    expect(renderCount).toBe(1)
+    S.c += 'c'
+    expect(vm.el.innerHTML).toBe('<h2 class="dynamic"><div class="bar">foo</div>ccc</h2>')
+    expect(renderCount).toBe(2)
+    S.b += 'o'
+    expect(vm.el.innerHTML).toBe('<h2 class="dynamic"><div class="bar">fooo</div>ccc</h2>')
+    expect(renderCount).toBe(2)
+    S.a++
+    expect(vm.el.innerHTML).toBe('<h3 class="dynamic"><div class="bar">fooo</div>ccc</h3>')
+    expect(renderCount).toBe(3)
   })
 })

@@ -1,4 +1,4 @@
-var _dep = [],
+var _dep = null,
   _arrToNode = new WeakMap(),
   _rendering = false // executing user render function
 
@@ -19,12 +19,14 @@ function mapDom(obj, key, el, elKey) {
   var getter
   typeof obj[key] == 'function' && (getter = obj[key])
   function updateDom(regather) {
-    if (regather && getter) _dep.push(updateDom)
+    if (regather && getter) _dep = updateDom
     _rendering = true
     var v = getter ? getter() : obj[key]
     _rendering = false
+    // gather deps when directly return array state
+    if (Array.isArray(v) && v._ls) v.map(() => {})
+    if (regather && getter) _dep = null
     typeof elKey == 'function' ? elKey(el, v) : (el[elKey] = v)
-    if (regather && getter) _dep.pop()
   }
   updateDom(true)
 }
@@ -62,10 +64,12 @@ function safeRemove(el) {
 // grab ndata from parent to make it newest (avoid value assign)
 function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.ndataKey = ndataKey = String(ndataKey)
-  var ndata = ndataParent[ndataKey]
+  var ndata = ndataParent[ndataKey], $$cache
   ndataValue = ndataValue || (typeof ndata == 'function' ? ndata() : ndata)
-  if (isPrimitive(ndataValue) || Array.isArray(ndataValue) || ndataValue == null) ndata = { $$: ndata }
-  else if (typeof ndata == 'function') ndata = ndataValue
+  if (isPrimitive(ndataValue) || Array.isArray(ndataValue) || ndataValue == null) {
+    ndata = { $$: ndata }
+    $$cache = ndataValue
+  } else if (typeof ndata == 'function') ndata = ndataValue
   this.key = key || ''
   this.childArrEls = []
   this.childEls = {}
@@ -86,8 +90,8 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
       //lightue directives
       if (i.slice(0, 2) == '$$') {
         var _depStashed = _dep
-        _dep = [] // avoid gather deps when getting oValue
-        var oValue = typeof o == 'function' ? o() : o
+        _dep = null // avoid gather deps when getting oValue
+        var oValue = $$cache || (typeof o == 'function' ? o() : o)
         _dep = _depStashed
         if (i == '$$' && Array.isArray(oValue)) {
           this.arrStart = new Comment('arr start')
@@ -98,6 +102,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
             var tempFragment = document.createDocumentFragment(),
               newEls = []
             if (Array.isArray(v)) {
+              if (v._ls) _arrToNode.set(v, this)
               if (v.$mappedFrom) _arrToNode.set(v.$mappedFrom, this)
               newEls = v.map((item, j) => {
                 return new Node(v, j, hyphenate(ndataKey) + '-item', tempFragment).el
@@ -210,7 +215,7 @@ function useState(src, depProxy) {
         return src[key]
       }
       if (!deps[key]) deps[key] = new Set()
-      _dep.length && deps[key].add(_dep[_dep.length - 1])
+      _dep && deps[key].add(_dep)
       var result = src[key]
       if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key])
 
@@ -264,9 +269,9 @@ Lightue.useState = function (src) {
 // run effect and gather deps for rerun
 Lightue.watchEffect = function (effect) {
   var runEffect = (regather) => {
-    regather && _dep.push(runEffect)
+    regather && (_dep = runEffect)
     effect()
-    regather && _dep.pop()
+    regather && (_dep = null)
   }
   runEffect(true)
 }
