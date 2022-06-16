@@ -25,6 +25,8 @@ var S = Lightue.useState({
 ```js
   myElement: {
     anotherElement: () => S.width
+    // a single state function can be abbreviated by adding $ to the rightmost key:
+    // anotherElement: S.$width
   },
 ```
 将输出：

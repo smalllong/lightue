@@ -230,12 +230,13 @@ function DemoComp() {
     },
   })
 
-  function Btn(text, onclick) {
+  function Btn(props, onclick) {
+    var P = L.useProp(props)
     return {
-      desc: () => 'component received param text: ' + text,
+      desc: () => 'component received param text: ' + P.text,
       btn: L.button({
         _type: 'button',
-        $$: text,
+        $$: P.$text,
         onclick: onclick,
       }),
     }
@@ -247,8 +248,14 @@ function DemoComp() {
       aaa: () => 'aaa: ' + S.aaa,
       bbbccc: () => 'bbb.ccc: ' + S.bbb.ccc,
     },
-    btn1: Btn(S.$aaa, () => (S.aaa += 4)),
-    btn2: Btn(S.bbb.$ccc, () => (S.bbb.ccc += 5)),
+    btn1: Btn(
+      () => ({ text: S.aaa }),
+      () => (S.aaa += 4)
+    ),
+    btn2: Btn(
+      () => ({ text: S.bbb.ccc }),
+      () => (S.bbb.ccc += 5)
+    ),
   }
 }
 

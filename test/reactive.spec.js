@@ -134,4 +134,25 @@ describe('reactive', () => {
     expect(vm.el.innerHTML).toBe('<h3 class="dynamic"><div class="bar">fooo</div>ccc</h3>')
     expect(renderCount).toBe(3)
   })
+
+  it('useProp', () => {
+    var S = L.useState({
+      foo: 123
+    })
+
+    function CompA(props) {
+      var P = L.useProp(props)
+      return {
+        bar: P.$propA
+      }
+    }
+
+    var vm = L({
+      instance: CompA(() => ({propA: S.foo + 321}))
+    })
+
+    expect(vm.el.innerHTML).toBe('<div class="instance"><div class="bar">444</div></div>')
+    S.foo = 222
+    expect(vm.el.innerHTML).toBe('<div class="instance"><div class="bar">543</div></div>')
+  })
 })

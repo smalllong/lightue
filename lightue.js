@@ -64,7 +64,8 @@ function safeRemove(el) {
 // grab ndata from parent to make it newest (avoid value assign)
 function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.ndataKey = ndataKey = String(ndataKey)
-  var ndata = ndataParent[ndataKey], $$cache
+  var ndata = ndataParent[ndataKey],
+    $$cache
   ndataValue = ndataValue || (typeof ndata == 'function' ? ndata() : ndata)
   if (isPrimitive(ndataValue) || Array.isArray(ndataValue) || ndataValue == null) {
     ndata = { $$: ndata }
@@ -222,6 +223,8 @@ function useState(src, depProxy) {
       return subStates[key] || result
     },
     set: function (src, key, value) {
+      // special length handling needed for now. todo: remove
+      if (!(Array.isArray(src) && key == 'length') && src[key] == value) return true
       var regather = false // is it needed to regather deps
       if (value && value._ls) {
         // already a state, just use
@@ -274,6 +277,16 @@ Lightue.watchEffect = function (effect) {
     regather && (_dep = null)
   }
   runEffect(true)
+}
+
+// turn prop function to prop state
+Lightue.useProp = function (props) {
+  var S = Lightue.useState({})
+  Lightue.watchEffect(() => {
+    var p = props()
+    for (var i in p) S[i] = p[i]
+  })
+  return S
 }
 
 //methods

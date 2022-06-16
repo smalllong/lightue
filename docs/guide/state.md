@@ -25,6 +25,8 @@ To show the state onto the page, you need to put it into VDomSrc using state fun
 ```js
   myElement: {
     anotherElement: () => S.width
+    // a single state function can be abbreviated by adding $ to the rightmost key:
+    // anotherElement: S.$width
   },
 ```
 
