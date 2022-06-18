@@ -68,6 +68,10 @@ setInterval(function () {
 
 effect 是一个状态函数。当调用 watchEffect 时，effect 会首先被立即执行。然后当此 effect 中使用的状态变化后，此 effect 会自动再次执行。你可以认为这些状态被观测用来再次执行 effect。
 
+## useProp(props)
+
+创建子组件的属性状态。参数 `props` 是一个父组件的状态函数，返回一个对象。 `useProp` 的返回值是一个供子组件使用的状态，会响应父组件状态的变化。
+
 ## 标签&类简写
 
 Lightue 自带一些 HTML 标签和类的简写方法。这些方法接收一个 VDomSrc，改变它然后返回一个$tag和$class 改变过的 VDomSrc。

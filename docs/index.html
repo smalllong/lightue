@@ -11,7 +11,6 @@
     <script>
       if (location.hash == '') location.hash = navigator.language.slice(0, 2) == 'zh' ? '#/zh/' : '#/'
       Lightuepress({
-        lastUpdated: true,
         repo: 'smalllong/lightue',
         docsDir: 'docs',
         docsBranch: 'master',
@@ -26,7 +25,6 @@
             selectText: 'Languages',
             ariaLabel: 'Select language',
             editLinkText: 'Edit this page on GitHub',
-            lastUpdated: 'Last Updated',
             nav: [
               { text: 'Guide', link: '/', activeMatch: '^/$|^/guide/' },
               {
@@ -49,7 +47,6 @@
             selectText: '选择语言',
             ariaLabel: '选择语言',
             editLinkText: '在 GitHub 上编辑此页',
-            lastUpdated: '上次更新',
             nav: [
               { text: '教程', link: '/', activeMatch: '^/$|^/guide/' },
               {

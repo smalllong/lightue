@@ -68,6 +68,10 @@ That's it. Just modify the state and dependent places will automatically update 
 
 The effect is a state function. When calling watchEffect, the effect will be executed immediately. Later when one of the states that used by effect changes, the effect will run again automatically. You can think of these states are being watched for rerunning the effect.
 
+## useProp(props)
+
+Create props state for child component. The param `props` is a parent component's state function returning an object. The return value of `useProp` is a state for child component which react to changes of parent component's states.
+
 ## Tag & class shortcuts
 
 Lightue comes with some html tag and class shortcut methods. These methods take in a VDomSrc, transform it and return a new VDomSrc with modified $tag and $class.

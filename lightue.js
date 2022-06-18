@@ -228,6 +228,7 @@ function useState(src, depProxy) {
       var regather = false // is it needed to regather deps
       if (value && value._ls) {
         // already a state, just use
+        if (src[key] == value._target) return true
         src[key] = value._target
         subStates[key] = value
       } else {
