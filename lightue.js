@@ -1,5 +1,4 @@
 var _dep = null,
-  _arrToNode = new WeakMap(),
   _rendering = false // executing user render function
 
 function Lightue(data, op = {}) {
@@ -23,8 +22,6 @@ function mapDom(obj, key, el, elKey) {
     _rendering = true
     var v = getter ? getter() : obj[key]
     _rendering = false
-    // gather deps when directly return array state
-    if (Array.isArray(v) && v._ls) v.map(() => {})
     if (regather && getter) _dep = null
     typeof elKey == 'function' ? elKey(el, v) : (el[elKey] = v)
   }
@@ -42,20 +39,8 @@ function assignObj(target, obj) {
   for (var i in obj) target[i] = obj[i]
 }
 
-function extendFunc(original, coming, initial) {
-  if (typeof original == 'function') {
-    return function (...args) {
-      original.call(this, ...args)
-      coming.call(this, ...args)
-    }
-  } else
-    return function (...args) {
-      initial && initial.call(this, ...args)
-      coming.call(this, ...args)
-    }
-}
-
 function safeRemove(el) {
+  if (!el) return
   el.VNode && el.VNode.cleanup && el.VNode.cleanup()
   el.remove()
 }
@@ -103,8 +88,8 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
             var tempFragment = document.createDocumentFragment(),
               newEls = []
             if (Array.isArray(v)) {
-              if (v._ls) _arrToNode.set(v, this)
-              if (v.$mappedFrom) _arrToNode.set(v.$mappedFrom, this)
+              if (v._ls) v._depNodes.push([this, v, (a) => a])
+              if (v._mappedFrom) v._mappedFrom[0].push([this, ...v._mappedFrom.slice(1)])
               newEls = v.map((item, j) => {
                 return new Node(v, j, hyphenate(ndataKey) + '-item', tempFragment).el
               })
@@ -170,12 +155,13 @@ Node.prototype._addChild = function (o, ndata, i, key) {
 function useState(src, depProxy) {
   if (!isObj(src) || src._ls) return src
   var deps = depProxy._deps, // get deps from dep proxy tree
-    subStates = {},
-    depItem
+    subStates = Array.isArray(src) ? [] : {},
+    depNodes = []
   return new Proxy(src, {
     get: function (src, key) {
       if (key == '_ls') return true
       if (key == '_target') return src
+      if (key == '_depNodes') return depNodes
       if (typeof key == 'string' && key[0] == '$') {
         var result = () => this.get(src, key.slice(1))
         result.toString = result
@@ -189,41 +175,67 @@ function useState(src, depProxy) {
             if (isObj(item)) subStates[i] = subStates[i] || useState(item, depProxy[i])
             return callback(subStates[i] || item, i)
           })
-          result.$mappedFrom = src
-          depItem = extendFunc(depItem, (item, i) => {
-            if (isObj(item)) {
-              subStates[i] = useState(item, depProxy[i])
-            }
-            var node = _arrToNode.get(src),
-              newDomSrc,
-              wrapper = {}
-            _rendering = true
-            newDomSrc = callback(subStates[i] || item, i)
-            _rendering = false
-            wrapper[i] = newDomSrc
-            var newNode = new Node(wrapper, i, hyphenate(node.ndataKey) + '-item')
-            node.el.insertBefore(newNode.el, node.childArrEls[i] || node.arrEnd)
-            node.childArrEls[i] && safeRemove(node.childArrEls[i])
-            node.childArrEls.splice(i, 1, newNode.el)
-          })
+          result._mappedFrom = [depNodes, src, callback]
           return result
         }
       }
 
-      // prototype methods
+      // prototype methods or array's length, reimplement or return src's
       if (src[key] != null && !src.hasOwnProperty(key)) {
+        // reimplement splice
+        if (Array.isArray(src) && key == 'splice')
+          return (index, remove, ...insert) => {
+            var oldLength = src.length
+            src.splice(index, remove, ...insert)
+            subStates.splice(index, remove, ...new Array(insert.length))
+            var newLength = src.length
+            for (var arr of depNodes) {
+              var node = arr[0],
+                cb = arr[2],
+                newElsFragment = new DocumentFragment()
+              for (var i = 0; i < remove; i++) safeRemove(node.childArrEls[index + i])
+              var newEls = insert.map((item, i) => {
+                var curIndex = index + i
+                if (isObj(item)) subStates[curIndex] = useState(item, depProxy[curIndex])
+                function updateDom(regather, skip) {
+                  regather && (_dep = updateDom)
+                  var newDomSrc = cb(subStates[curIndex] || item, curIndex),
+                    wrapper = {}
+                  regather && (_dep = null)
+                  wrapper[curIndex] = newDomSrc
+                  var newNode = new Node(wrapper, curIndex, hyphenate(node.ndataKey) + '-item')
+                  if (skip) return newNode.el
+                  else {
+                    node.el.insertBefore(newNode.el, node.childArrEls[curIndex] || node.arrEnd)
+                    node.childArrEls[curIndex] && safeRemove(node.childArrEls[curIndex])
+                    node.childArrEls.splice(curIndex, 1, newNode.el)
+                  }
+                }
+                var newEl = updateDom(true, true)
+                newElsFragment.appendChild(newEl)
+                return newEl
+              })
+              node.el.insertBefore(newElsFragment, node.childArrEls[index + remove] || node.arrEnd)
+              node.childArrEls.splice(index, remove, ...newEls)
+            }
+            oldLength != newLength && deps._length && deps._length.forEach((dep) => dep())
+          }
         if (!Array.isArray(src) && typeof src[key] == 'function') return src[key].bind(src)
         return src[key]
       }
+
+      // avoid conflict of subStates array
+      if (Array.isArray(src) && key == 'length') key = '_length'
       if (!deps[key]) deps[key] = new Set()
       _dep && deps[key].add(_dep)
+      if (Array.isArray(src) && key == '_length') return src.length
       var result = src[key]
       if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key])
 
       return subStates[key] || result
     },
     set: function (src, key, value) {
-      // special length handling needed for now. todo: remove
+      // when setting length, src[key] will usually equal to value, but we still want dep call
       if (!(Array.isArray(src) && key == 'length') && src[key] == value) return true
       var regather = false // is it needed to regather deps
       if (value && value._ls) {
@@ -238,15 +250,17 @@ function useState(src, depProxy) {
           subStates[key] = useState(value, depProxy[key])
           regather = true
         } else {
-          if (Array.isArray(src) && key == 'length') regather = true // regather deps when arr length changed
-          delete subStates[key]
+          if (Array.isArray(src) && key == 'length') {
+            regather = true
+            key = '_length'
+          } else delete subStates[key]
         }
       }
       if (!Lightue._abortDep) {
         deps[key] && deps[key].forEach((dep) => dep(regather))
         if (Array.isArray(src)) {
-          key = parseInt(key)
-          key >= 0 && depItem && depItem(value, key)
+          key = Number(key)
+          !isNaN(key) && key >= 0 && this.get(src, 'splice')(key, 1, value)
         }
       }
       return true

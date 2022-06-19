@@ -3,6 +3,43 @@ var S = L.useState({
   curDemo: 0,
 })
 
+function DemoComp() {
+  var S = L.useState({
+    aaa: 123,
+    bbb: {
+      ccc: '345',
+    },
+  })
+
+  function Btn(props, onclick) {
+    var P = L.useProp(props)
+    return {
+      desc: () => 'component received param text: ' + P.text,
+      btn: L.button({
+        _type: 'button',
+        $$: P.$text,
+        onclick: onclick,
+      }),
+    }
+  }
+
+  return {
+    states: {
+      $$: 'parent states:',
+      aaa: () => 'aaa: ' + S.aaa,
+      bbbccc: () => 'bbb.ccc: ' + S.bbb.ccc,
+    },
+    btn1: Btn(
+      () => ({ text: S.aaa }),
+      () => (S.aaa += 4)
+    ),
+    btn2: Btn(
+      () => ({ text: S.bbb.ccc }),
+      () => (S.bbb.ccc += 5)
+    ),
+  }
+}
+
 function DemoGrowingRect() {
   var S = Lightue.useState({
     width: 20,
@@ -137,13 +174,19 @@ function DemoSimplifyRatio() {
 function DemoList() {
   var S = L.useState({
       list: [],
+      action: 'change',
       newTitle: false,
+      count: 0,
     }),
     count = 0
   var changeList = setInterval(() => {
     count++
     S.newTitle = !S.newTitle
-    if (S.newTitle) {
+    if (S.action == 'push') {
+      S.action = 'splice'
+      S.list.splice(2, 2, 1)
+    } else if (S.action == 'change') {
+      S.action = 'push'
       S.list.push(Math.random())
     } else {
       var temp = []
@@ -151,13 +194,14 @@ function DemoList() {
         temp.push(Math.random())
       }
       S.list = temp
+      S.action = 'change'
     }
-  }, 3000)
+  }, 2500)
   return {
     $cleanup: () => clearInterval(changeList),
     title: {
-      $class: { newTitle: () => S.newTitle, oldTitle: () => !S.newTitle },
-      content: () => (S.newTitle ? 'item pushed' : 'list changed'),
+      $class: { newTitle: () => S.newTitle },
+      content: () => 'List ' + S.action + 'd',
     },
     theList: {
       beforeList: () => 'The list starts with length: ' + S.list.length,
@@ -219,43 +263,6 @@ function DemoForm() {
       ],
       result: () => JSON.stringify(S.formData),
     }),
-  }
-}
-
-function DemoComp() {
-  var S = L.useState({
-    aaa: 123,
-    bbb: {
-      ccc: '345',
-    },
-  })
-
-  function Btn(props, onclick) {
-    var P = L.useProp(props)
-    return {
-      desc: () => 'component received param text: ' + P.text,
-      btn: L.button({
-        _type: 'button',
-        $$: P.$text,
-        onclick: onclick,
-      }),
-    }
-  }
-
-  return {
-    states: {
-      $$: 'parent states:',
-      aaa: () => 'aaa: ' + S.aaa,
-      bbbccc: () => 'bbb.ccc: ' + S.bbb.ccc,
-    },
-    btn1: Btn(
-      () => ({ text: S.aaa }),
-      () => (S.aaa += 4)
-    ),
-    btn2: Btn(
-      () => ({ text: S.bbb.ccc }),
-      () => (S.bbb.ccc += 5)
-    ),
   }
 }
 
