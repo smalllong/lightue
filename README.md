@@ -8,7 +8,7 @@ A lightweight and simple web frontend model-view framework inspired by Vue.js
 
 ## Highlights
 
-- Super lightweight (<2KB min+br)
+- Super lightweight (<2.5KB min+br)
 - State driven dom updates
 - JS object style template, great editor support in JS context
 - Flexible function style components

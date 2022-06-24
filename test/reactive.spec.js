@@ -161,6 +161,7 @@ describe('reactive', () => {
       showElem: true,
       content: '111',
       showBaz: false,
+      aaa: 'aaa',
     })
     var vm = L({
       foo: {
@@ -168,10 +169,10 @@ describe('reactive', () => {
         $$: () => S.content,
       },
       bar: '333',
-      baz: {
+      baz: () => ({
         $if: () => S.showBaz,
-        $$: 'aaa',
-      },
+        $$: S.aaa,
+      }),
     })
     expect(vm.el.innerHTML).toBe('<div class="foo">111</div><div class="bar">333</div><!--baz-->')
     S.showElem = false
@@ -181,6 +182,11 @@ describe('reactive', () => {
     expect(vm.el.innerHTML).toBe('<div class="foo">222</div><div class="bar">333</div><!--baz-->')
     S.showBaz = true
     expect(vm.el.innerHTML).toBe('<div class="foo">222</div><div class="bar">333</div><div class="baz">aaa</div>')
+    S.aaa = 'bbb' // ensure $if not break when element rerendered
+    S.showBaz = false
+    expect(vm.el.innerHTML).toBe('<div class="foo">222</div><div class="bar">333</div><!--baz-->')
+    S.showBaz = true
+    expect(vm.el.innerHTML).toBe('<div class="foo">222</div><div class="bar">333</div><div class="baz">bbb</div>')
   })
 
   it('watchEffect', () => {

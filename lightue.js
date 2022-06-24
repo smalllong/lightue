@@ -2,7 +2,7 @@ var _dep = null,
   _rendering = false // executing user render function
 
 function Lightue(data, op = {}) {
-  var vm = new Node({ root: data }, 'root', 'root', document.querySelector(op.el || 'body')),
+  var vm = new Node(data, 'root', 'root', document.querySelector(op.el || 'body')),
     toFocus = vm.el.querySelector('[autofocus]')
   toFocus && toFocus.focus()
   return vm
@@ -14,18 +14,30 @@ function hyphenate(str) {
 }
 
 // elKey can be a custom setting function
-function mapDom(obj, key, el, elKey) {
-  var getter
-  typeof obj[key] == 'function' && (getter = obj[key])
+function mapDom(value, el, elKey) {
+  var getter,
+    lastV,
+    weakEl = new WeakRef(el)
+  typeof value == 'function' && (getter = value)
   function updateDom(regather) {
-    if (regather && getter) _dep = updateDom
+    var wel = weakEl.deref()
+    if (!wel) return
+    if (regather && getter) _dep = [updateDom, wel]
     _rendering = true
-    var v = getter ? getter() : obj[key]
+    var v = getter ? getter() : value
     _rendering = false
     if (regather && getter) _dep = null
-    typeof elKey == 'function' ? elKey(el, v) : (el[elKey] = v)
+    if (isObj(v)) {
+      // for obj always rerender even if it's the same obj
+      lastV = NaN
+    } else {
+      if (v == lastV) return
+      lastV = v
+    }
+    typeof elKey == 'function' ? elKey(wel, v) : (wel[elKey] = v)
   }
   updateDom(true)
+  return updateDom
 }
 
 function isPrimitive(data) {
@@ -45,12 +57,39 @@ function safeRemove(el) {
   el.remove()
 }
 
+function moveArr(arr, from, to) {
+  var itemArr = arr.splice(from, 1)
+  arr.splice(to, 0, itemArr[0])
+}
+
+var domUpdaters = {
+  $class: (j) => (el, v) => {
+    el.classList[v ? 'add' : 'remove'](hyphenate(j))
+  },
+  $if: (key) => (el, v) => {
+    var node = el.VNode
+    if (!node.placeholder) node.placeholder = new Comment(key)
+    if (v && node.isStashed) {
+      node.placeholder.parentNode && node.placeholder.parentNode.insertBefore(el, node.placeholder)
+      node.placeholder.remove()
+      node.isStashed = false
+    } else if (!v && !node.isStashed) {
+      el.parentNode && el.parentNode.insertBefore(node.placeholder, el)
+      el.remove()
+      node.isStashed = true
+    }
+  },
+  texts: (i) => (el, v) => (el.VNode.texts[i].textContent = v),
+  _: (attr) => (el, v) => {
+    v != null && v !== false ? el.setAttribute(attr, v) : el.removeAttribute(attr)
+  },
+}
+
 // VDOM Node
 // grab ndata from parent to make it newest (avoid value assign)
-function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
+function Node(ndata, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.ndataKey = ndataKey = String(ndataKey)
-  var ndata = ndataParent[ndataKey],
-    $$cache
+  var $$cache
   ndataValue = ndataValue || (typeof ndata == 'function' ? ndata() : ndata)
   if (isPrimitive(ndataValue) || Array.isArray(ndataValue) || ndataValue == null) {
     ndata = { $$: ndata }
@@ -69,7 +108,7 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
   this.texts = {}
   this.el.VNode = this
   for (var i in ndata) {
-    var o = ndata[i]
+    let o = ndata[i]
     // skip handle null and undefined, but for boolean properties, treat them falsy
     if (i != '$if' && i != '$checked' && o == null) continue
     if (i[0] == '$') {
@@ -84,14 +123,14 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
           this.arrEnd = new Comment('arr end')
           this.el.appendChild(this.arrStart)
           this.el.appendChild(this.arrEnd)
-          mapDom(ndata, i, this.el, (el, v) => {
+          this.arrUpdate = mapDom(o, this.el, (el, v) => {
             var tempFragment = document.createDocumentFragment(),
               newEls = []
             if (Array.isArray(v)) {
               if (v._ls) v._depNodes.push([this, v, (a) => a])
               if (v._mappedFrom) v._mappedFrom[0].push([this, ...v._mappedFrom.slice(1)])
               newEls = v.map((item, j) => {
-                return new Node(v, j, hyphenate(ndataKey) + '-item', tempFragment).el
+                return new Node(item, j, hyphenate(ndataKey) + '-item', tempFragment).el
               })
             } else newEls.push(tempFragment.appendChild(document.createElement('span')))
             this.el.insertBefore(tempFragment, this.arrEnd)
@@ -99,62 +138,51 @@ function Node(ndataParent, ndataKey, key, appendToEl, ndataValue, originalEl) {
             this.childArrEls = newEls
           })
         } else if (isObj(oValue)) {
-          this._addChild(o, ndata, i)
+          this._addChild(o, i)
         } else if (isPrimitive(oValue)) {
           this.texts[i] = document.createTextNode(oValue)
           this.el.appendChild(this.texts[i])
-          mapDom(ndata, i, this.texts[i], 'textContent')
+          mapDom(o, this.el, domUpdaters.texts(i))
         }
       } else if (i.slice(0, 2) == '$_') {
         //span element shortcut
-        this._addChild(o, ndata, i, hyphenate(i.slice(2)))
+        this._addChild(o, i, hyphenate(i.slice(2)))
       } else if (i == '$if') {
         // conditionally switch between elem and its placeholder
-        mapDom(ndata, i, this.el, (el, v) => {
-          if (!this.placeholder) this.placeholder = new Comment(key)
-          if (v && this.isStashed) {
-            this.placeholder.parentNode.insertBefore(this.el, this.placeholder)
-            this.placeholder.remove()
-            this.isStashed = false
-          } else if (!v && !this.isStashed) {
-            this.el.parentNode.insertBefore(this.placeholder, this.el)
-            this.el.remove()
-            this.isStashed = true
-          }
-        })
+        let bo = typeof o == 'function' ? () => Boolean(o()) : Boolean(o)
+        mapDom(bo, this.el, domUpdaters.$if(key))
       } else if (i == '$class') {
         Object.keys(o).forEach((j) => {
-          mapDom(o, j, this.el, function (el, v) {
-            el.classList[v ? 'add' : 'remove'](hyphenate(j))
-          })
+          mapDom(o[j], this.el, domUpdaters.$class(j))
         })
-      } else if (i == '$value' && ['input', 'textarea', 'select'].indexOf(this.tag) > -1)
-        mapDom(ndata, '$value', this.el, 'value')
-      else if (i == '$checked' && this.tag == 'input') mapDom(ndata, '$checked', this.el, 'checked')
+      } else if (i == '$value' && ['input', 'textarea', 'select'].indexOf(this.tag) > -1) mapDom(o, this.el, 'value')
+      else if (i == '$checked' && this.tag == 'input') mapDom(o, this.el, 'checked')
       else if (i == '$cleanup') this.cleanup = o
     } else if (i[0] == '_') {
       ;((attr) => {
-        mapDom(ndata, i, this.el, function (el, v) {
-          v != null && v !== false ? el.setAttribute(attr, v) : el.removeAttribute(attr)
-        })
+        mapDom(o, this.el, domUpdaters._(attr))
       })(hyphenate(i.slice(1)))
     } else if (i.slice(0, 2) == 'on') this.el.addEventListener(i.slice(2), o)
-    else this._addChild(o, ndata, i, hyphenate(i))
+    else this._addChild(o, i, hyphenate(i))
   }
 }
 
-Node.prototype._addChild = function (o, ndata, i, key) {
+Node.prototype._addChild = function (o, i, key) {
   if (typeof o == 'function')
-    mapDom(ndata, i, this.el, (el, v) => {
+    mapDom(o, this.el, (el, v) => {
       // only create new VNode when first render or obj rerender
-      if (!this.childEls[i] || isObj(v)) this.childEls[i] = new Node(ndata, i, key, this.el, v, this.childEls[i]).el
+      if (!this.childEls[i] || isObj(v)) this.childEls[i] = new Node(o, i, key, this.el, v, this.childEls[i]).el
     })
-  else new Node(ndata, i, key, this.el)
+  else new Node(o, i, key, this.el)
 }
 
-function useState(src, depProxy) {
+var registry = new FinalizationRegistry((h) => {
+  h.set.delete(h.item)
+})
+
+function useState(src) {
   if (!isObj(src) || src._ls) return src
-  var deps = depProxy._deps, // get deps from dep proxy tree
+  var deps = {},
     subStates = Array.isArray(src) ? [] : {},
     depNodes = []
   return new Proxy(src, {
@@ -172,7 +200,7 @@ function useState(src, depProxy) {
       if (Array.isArray(src) && key == 'map' && _rendering) {
         return function (callback) {
           var result = src.map((item, i) => {
-            if (isObj(item)) subStates[i] = subStates[i] || useState(item, depProxy[i])
+            if (isObj(item)) subStates[i] = subStates[i] || useState(item)
             return callback(subStates[i] || item, i)
           })
           result._mappedFrom = [depNodes, src, callback]
@@ -180,46 +208,50 @@ function useState(src, depProxy) {
         }
       }
 
-      // prototype methods or array's length, reimplement or return src's
-      if (src[key] != null && !src.hasOwnProperty(key)) {
-        // reimplement splice
-        if (Array.isArray(src) && key == 'splice')
-          return (index, remove, ...insert) => {
-            var oldLength = src.length
-            src.splice(index, remove, ...insert)
-            subStates.splice(index, remove, ...new Array(insert.length))
-            var newLength = src.length
-            for (var arr of depNodes) {
-              var node = arr[0],
-                cb = arr[2],
-                newElsFragment = new DocumentFragment()
-              for (var i = 0; i < remove; i++) safeRemove(node.childArrEls[index + i])
-              var newEls = insert.map((item, i) => {
-                var curIndex = index + i
-                if (isObj(item)) subStates[curIndex] = useState(item, depProxy[curIndex])
-                function updateDom(regather, skip) {
-                  regather && (_dep = updateDom)
-                  var newDomSrc = cb(subStates[curIndex] || item, curIndex),
-                    wrapper = {}
-                  regather && (_dep = null)
-                  wrapper[curIndex] = newDomSrc
-                  var newNode = new Node(wrapper, curIndex, hyphenate(node.ndataKey) + '-item')
-                  if (skip) return newNode.el
-                  else {
-                    node.el.insertBefore(newNode.el, node.childArrEls[curIndex] || node.arrEnd)
-                    node.childArrEls[curIndex] && safeRemove(node.childArrEls[curIndex])
-                    node.childArrEls.splice(curIndex, 1, newNode.el)
-                  }
-                }
-                var newEl = updateDom(true, true)
-                newElsFragment.appendChild(newEl)
-                return newEl
-              })
-              node.el.insertBefore(newElsFragment, node.childArrEls[index + remove] || node.arrEnd)
-              node.childArrEls.splice(index, remove, ...newEls)
-            }
-            oldLength != newLength && deps._length && deps._length.forEach((dep) => dep())
+      if (Array.isArray(src) && key == 'move')
+        return (itemIndex, newIndex) => {
+          moveArr(src, itemIndex, newIndex)
+          moveArr(subStates, itemIndex, newIndex)
+          for (var arr of depNodes) {
+            var node = arr[0]
+            moveArr(node.childArrEls, itemIndex, newIndex)
+            node.el.insertBefore(node.childArrEls[newIndex], node.childArrEls[newIndex + 1] || node.arrEnd)
           }
+        }
+
+      if (src[key] != null && !src.hasOwnProperty(key)) {
+        // prototype methods or array's length, reimplement or return src's
+        if (Array.isArray(src)) {
+          // reimplement splice
+          if (key == 'splice')
+            return (index, remove, ...insert) => {
+              var oldLength = src.length
+              src.splice(index, remove, ...insert)
+              subStates.splice(index, remove, ...new Array(insert.length))
+              var newLength = src.length
+              for (var arr of depNodes) {
+                var node = arr[0],
+                  cb = arr[2],
+                  newElsFragment = new DocumentFragment()
+                for (var i = 0; i < remove; i++) safeRemove(node.childArrEls[index + i])
+                var newEls = insert.map((item, i) => {
+                  var curIndex = index + i
+                  if (isObj(item)) subStates[curIndex] = useState(item)
+                  _dep = [node.arrUpdate, node.el]
+                  _rendering = true
+                  var v = cb(subStates[curIndex] || item, curIndex)
+                  _rendering = false
+                  _dep = null
+                  var newNode = new Node(v, curIndex, hyphenate(node.ndataKey) + '-item')
+                  newElsFragment.appendChild(newNode.el)
+                  return newNode.el
+                })
+                node.el.insertBefore(newElsFragment, node.childArrEls[index + remove] || node.arrEnd)
+                node.childArrEls.splice(index, remove, ...newEls)
+              }
+              oldLength != newLength && deps._length && deps._length.forEach((dep) => dep())
+            }
+        }
         if (!Array.isArray(src) && typeof src[key] == 'function') return src[key].bind(src)
         return src[key]
       }
@@ -227,10 +259,18 @@ function useState(src, depProxy) {
       // avoid conflict of subStates array
       if (Array.isArray(src) && key == 'length') key = '_length'
       if (!deps[key]) deps[key] = new Set()
-      _dep && deps[key].add(_dep)
+      if (_dep) {
+        deps[key].add(_dep[0])
+        // GC dep with el
+        if (_dep[1])
+          registry.register(_dep[1], {
+            set: deps[key],
+            item: _dep[0],
+          })
+      }
       if (Array.isArray(src) && key == '_length') return src.length
       var result = src[key]
-      if (isObj(result)) subStates[key] = subStates[key] || useState(result, depProxy[key])
+      if (isObj(result)) subStates[key] = subStates[key] || useState(result)
 
       return subStates[key] || result
     },
@@ -247,7 +287,7 @@ function useState(src, depProxy) {
         // create new state & cache
         src[key] = value
         if (isObj(value)) {
-          subStates[key] = useState(value, depProxy[key])
+          subStates[key] = useState(value)
           regather = true
         } else {
           if (Array.isArray(src) && key == 'length') {
@@ -269,25 +309,13 @@ function useState(src, depProxy) {
 }
 
 Lightue.useState = function (src) {
-  // dep proxy tree (even if the state subtree changed, deps still kept)
-  function genDepProxy() {
-    return new Proxy(
-      {},
-      {
-        get: (src, key) => {
-          if (!src[key]) src[key] = key == '_deps' ? {} : genDepProxy()
-          return src[key]
-        },
-      }
-    )
-  }
-  return useState(src, genDepProxy())
+  return useState(src)
 }
 
 // run effect and gather deps for rerun
 Lightue.watchEffect = function (effect) {
   var runEffect = (regather) => {
-    regather && (_dep = runEffect)
+    regather && (_dep = [runEffect])
     effect()
     regather && (_dep = null)
   }

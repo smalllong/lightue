@@ -42,6 +42,6 @@
     "vdom"
   ],
   "browserslist": [
-    "firefox >= 27"
+    "firefox >= 79"
   ]
 }
