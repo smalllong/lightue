@@ -7,9 +7,26 @@
     <title>Lightue</title>
   </head>
   <body>
-    <script src="https://unpkg.com/lightuepress@0.1.4/dist/lightuepress.min.js"></script>
+    <script src="https://unpkg.com/lightuepress@0.1.5/dist/lightuepress.min.js"></script>
     <script>
       if (location.hash == '') location.hash = navigator.language.slice(0, 2) == 'zh' ? '#/zh/' : '#/'
+
+      var servers = [
+        {
+          text: 'Netlify',
+          link: 'https://lightue.netlify.app',
+        },
+        {
+          text: 'Vercel',
+          link: 'https://lightue.vercel.app',
+        },
+        {
+          text: 'Cloudflare',
+          link: 'https://lightue.pages.dev',
+        },
+      ]
+      servers.forEach((s) => (s.active = s.link == location.origin))
+
       Lightuepress({
         repo: 'smalllong/lightue',
         docsDir: 'docs',
@@ -32,6 +49,10 @@
                 link: '/api/global',
                 activeMatch: '^/api/',
               },
+              {
+                text: 'Servers',
+                items: servers,
+              },
             ],
             sidebar: {
               '/guide/': getGuideSidebar(''),
@@ -53,6 +74,10 @@
                 text: 'API',
                 link: '/api/global',
                 activeMatch: '^/api/',
+              },
+              {
+                text: '服务器',
+                items: servers,
               },
             ],
             sidebar: {

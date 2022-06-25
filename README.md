@@ -14,6 +14,6 @@ A lightweight and simple web frontend model-view framework inspired by Vue.js
 - Flexible function style components
 - Low overhead, easily setup and run
 
-## Document has been moved to https://lightue.netlify.app/
+## Document has been moved to https://lightue.netlify.app/ or https://lightue.vercel.app/
 
 If you have any advices or concerns, you can leave an issue :-)

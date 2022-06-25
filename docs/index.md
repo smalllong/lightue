@@ -10,7 +10,7 @@ Try the live example [here](https://codepen.io/lxl898/pen/vYyooWK)
 
 ## Highlights
 
-- Super lightweight (<2KB min+br)
+- Super lightweight (<2.5KB min+br)
 - State driven dom updates
 - JS object style template, great editor support in JS context
 - Flexible function style components
