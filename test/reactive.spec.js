@@ -269,4 +269,29 @@ describe('reactive', () => {
     S.foo = 222
     expect(vm.el.innerHTML).toBe('<div class="instance"><div class="bar">543</div></div>')
   })
+
+  it('useComp', () => {
+    var S = L.useState({
+      foo: 123,
+    })
+
+    var CompA = L.useComp(function (P) {
+      return {
+        bar: P.$propA,
+      }
+    })
+
+    var vm = L({
+      instance: CompA(() => ({ propA: S.foo + 123 })),
+      instance2: CompA.myComp(() => ({ propA: S.foo + 321 })),
+    })
+
+    expect(vm.el.innerHTML).toBe(
+      '<div class="instance"><div class="bar">246</div></div><div class="instance2 my-comp"><div class="bar">444</div></div>'
+    )
+    S.foo = 222
+    expect(vm.el.innerHTML).toBe(
+      '<div class="instance"><div class="bar">345</div></div><div class="instance2 my-comp"><div class="bar">543</div></div>'
+    )
+  })
 })

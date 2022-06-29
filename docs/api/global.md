@@ -72,6 +72,10 @@ The effect is a state function. When calling watchEffect, the effect will be exe
 
 Create props state for child component. The param `props` is a parent component's state function returning an object. The return value of `useProp` is a state for child component which react to changes of parent component's states.
 
+## useComp(comp)
+
+Create a factory function component. The param `comp` is a factory function which returns a VDomSrc. Compared with using factory function directly, its advantage is that it applies `useProp` automatically for the first param; it also enables you to add HTML classname to the component instance easily by using dot notation.
+
 ## Tag & class shortcuts
 
 Lightue comes with some html tag and class shortcut methods. These methods take in a VDomSrc, transform it and return a new VDomSrc with modified $tag and $class.

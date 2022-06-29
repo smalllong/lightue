@@ -10,7 +10,7 @@
     "build-node": "rollup lightue.js --format cjs --file dist/cjs.js",
     "build": "yarn build-browser && yarn build-node && terser dist/iife.js -c -m -o dist/lightue.min.js",
     "docs:build": "node publish-doc.js",
-    "docs": "cd docs && python -m SimpleHTTPServer 3000",
+    "docs": "cd docs && python -m http.server 3000",
     "test": "jest --env=jsdom"
   },
   "repository": {

@@ -93,3 +93,18 @@ L({
 })
 setInterval(() => S.foo++, 1000)
 ```
+
+另外你也可以使用 [useComp](../api/global#useComp-comp-) 来定义组件。它会帮你在第一个参数上应用 `useProp` 。它也允许你给创建的组件实例再添加HTML类名：
+
+```js
+var CompA = L.useComp(function (P) { // P is already processed by useProp
+  return {
+    bar: P.$propA,
+  }
+})
+
+var vm = L({
+  instance: CompA(() => ({ propA: S.foo + 123 })), // directly call it just like above
+  instance2: CompA.myComp(() => ({ propA: S.foo + 321 })), // easily add 'my-comp' class to this instance
+})
+```

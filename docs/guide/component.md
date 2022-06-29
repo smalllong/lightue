@@ -93,3 +93,18 @@ L({
 })
 setInterval(() => S.foo++, 1000)
 ```
+
+Alternatively you can use the [useComp](../api/global#useComp-comp-) to define the component. It will apply `useProp` for you on the first param. It also enables you to add HTML classname to the component instance:
+
+```js
+var CompA = L.useComp(function (P) { // P is already processed by useProp
+  return {
+    bar: P.$propA,
+  }
+})
+
+var vm = L({
+  instance: CompA(() => ({ propA: S.foo + 123 })), // directly call it just like above
+  instance2: CompA.myComp(() => ({ propA: S.foo + 321 })), // easily add 'my-comp' class to this instance
+})
+```

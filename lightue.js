@@ -332,6 +332,25 @@ Lightue.useProp = function (props) {
   return S
 }
 
+Lightue.useComp = function (func) {
+  function getComp(className) {
+    // call comp
+    return function (props, ...args) {
+      var tmp = func(Lightue.useProp(props), ...args)
+      if (className) {
+        if (!tmp.$class) tmp.$class = {}
+        tmp.$class[className] = 1
+      }
+      return tmp
+    }
+  }
+  return new Proxy(getComp(), {
+    get: function (src, key) {
+      return getComp(key)
+    },
+  })
+}
+
 //methods
 Lightue.for = function (count, generateItem) {
   var arr = []
