@@ -27,7 +27,7 @@
     "todomvc-common": "^1.0.5"
   },
   "files": [
-    "lightue.js",
+    "src",
     "dist/cjs.js",
     "dist/lightue.min.js"
   ],
