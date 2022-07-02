@@ -35,19 +35,19 @@ describe('reactive', () => {
 
     expect(vm.el.children[0].children.length).toBe(4)
     expect(vm.el.textContent).toBe('2357')
-    expect(renderCount).toBe(2)
+    expect(renderCount).toBe(1)
     S.list.push(11)
     expect(vm.el.children[0].children.length).toBe(5)
     expect(vm.el.textContent).toBe('235711')
-    expect(renderCount).toBe(2)
+    expect(renderCount).toBe(1)
     S.list[2] = 432
     expect(vm.el.children[0].children.length).toBe(5)
     expect(vm.el.textContent).toBe('23432711')
-    expect(renderCount).toBe(2)
+    expect(renderCount).toBe(1)
     S.list = [999, 888, 777]
     expect(vm.el.children[0].children.length).toBe(3)
     expect(vm.el.textContent).toBe('999888777')
-    expect(renderCount).toBe(6) // currently there are too many rerenders, need optimization later
+    expect(renderCount).toBe(2)
   })
 
   it('multiple array mapped VDomSrc changed', () => {
@@ -62,7 +62,7 @@ describe('reactive', () => {
       l1: () => {
         count++
         return S.list.map((item) => {
-          innerCount ++
+          innerCount++
           return {
             $$: item + 2,
             flag: S.$flag,
@@ -79,7 +79,7 @@ describe('reactive', () => {
           }
         })
       },
-      length: () => S.list.length
+      length: () => S.list.length,
     })
 
     function buildResult(arr, flag, cname) {
@@ -93,49 +93,53 @@ describe('reactive', () => {
     expect(vm.el.children[0].innerHTML).toBe(buildResult([4, 5, 7], 0, 'l1'))
     expect(vm.el.children[1].innerHTML).toBe(buildResult([4, 6, 10], 0, 'l2'))
     expect(vm.el.children[2].textContent).toBe('3')
-    expect(count).toBe(4)
-    expect(innerCount).toBe(12)
+    expect(count).toBe(2)
+    expect(innerCount).toBe(6)
     S.list.push(7)
     expect(vm.el.children[0].innerHTML).toBe(buildResult([4, 5, 7, 9], 0, 'l1'))
     expect(vm.el.children[1].innerHTML).toBe(buildResult([4, 6, 10, 14], 0, 'l2'))
     expect(vm.el.children[2].textContent).toBe('4')
-    expect(count).toBe(4)
-    expect(innerCount).toBe(14)
+    expect(count).toBe(2)
+    expect(innerCount).toBe(8)
     S.flag++
     expect(vm.el.children[0].innerHTML).toBe(buildResult([4, 5, 7, 9], 1, 'l1'))
     expect(vm.el.children[1].innerHTML).toBe(buildResult([4, 6, 10, 14], 1, 'l2'))
-    expect(count).toBe(4)
-    expect(innerCount).toBe(14)
+    expect(count).toBe(2)
+    expect(innerCount).toBe(8)
     S.list[1] = 4
     expect(vm.el.children[0].innerHTML).toBe(buildResult([4, 6, 7, 9], 1, 'l1'))
     expect(vm.el.children[1].innerHTML).toBe(buildResult([4, 8, 10, 14], 1, 'l2'))
-    expect(count).toBe(4)
-    expect(innerCount).toBe(16)
+    expect(count).toBe(2)
+    expect(innerCount).toBe(10)
     S.list = [9, 8, 7]
     expect(vm.el.children[0].innerHTML).toBe(buildResult([11, 10, 9], 1, 'l1'))
     expect(vm.el.children[1].innerHTML).toBe(buildResult([18, 16, 14], 1, 'l2'))
-    expect(count).toBe(12)
-    expect(innerCount).toBe(40) // need optimizations
+    expect(count).toBe(4)
+    expect(innerCount).toBe(16)
   })
 
   it('complicated array state', () => {
     var S = L.useState({
-      list: [{
-        flag: false,
-        txt: 'foo'
-      }, {
-        flag: true,
-        txt: 'bar'
-      }]
+      list: [
+        {
+          flag: false,
+          txt: 'foo',
+        },
+        {
+          flag: true,
+          txt: 'bar',
+        },
+      ],
     })
 
     var vm = L({
       allTrue: {
         $if: () => S.list.filter((item) => item.flag).length == S.list.length,
       },
-      list: () => S.list.map(item => ({
-        $$: item.txt
-      }))
+      list: () =>
+        S.list.map((item) => ({
+          $$: item.txt,
+        })),
     })
 
     expect(vm.el.innerHTML).toBe(
@@ -145,7 +149,7 @@ describe('reactive', () => {
     expect(vm.el.innerHTML).toBe(
       '<div class="all-true"></div><div class="list"><!--arr start--><div class="list-item">foo</div><div class="list-item">bar</div><!--arr end--></div>'
     )
-    S.list.push({flag: false, txt: 'abc'})
+    S.list.push({ flag: false, txt: 'abc' })
     expect(vm.el.innerHTML).toBe(
       '<!--all-true--><div class="list"><!--arr start--><div class="list-item">foo</div><div class="list-item">bar</div><div class="list-item">abc</div><!--arr end--></div>'
     )
@@ -154,6 +158,42 @@ describe('reactive', () => {
     expect(vm.el.innerHTML).toBe(
       '<div class="all-true"></div><div class="list"><!--arr start--><div class="list-item">foo</div><div class="list-item">bar</div><div class="list-item">cde</div><!--arr end--></div>'
     )
+  })
+
+  it('array item level state function', () => {
+    var S = L.useState({
+        list: [
+          {
+            txt: 'foo',
+          },
+          {
+            txt: 'bar',
+          },
+        ],
+      }),
+      count = 0
+
+    var vm = L({
+      list: () =>
+        S.list.map((item) => () => {
+          count++
+          return {
+            $tag: 'button',
+            _type: 'button',
+            $$: item.txt,
+            onclick: () => (item.txt += 'o'),
+          }
+        }),
+    })
+
+    expect(count).toBe(2)
+    expect(vm.el.textContent).toBe('foobar')
+    vm.el.children[0].children[0].click()
+    expect(count).toBe(3)
+    expect(vm.el.textContent).toBe('fooobar')
+    S.list = [{ txt: 'aaa' }, { txt: 'bbb' }]
+    expect(count).toBe(5)
+    expect(vm.el.textContent).toBe('aaabbb')
   })
 
   it('conditionally render', () => {

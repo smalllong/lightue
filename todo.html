@@ -112,7 +112,7 @@
                           S.editedTodo = todo
                           e.target.parentElement.nextElementSibling.focus()
                         },
-                        $$: todo.title,
+                        $$: todo.$title,
                       }),
                       destroy: L.button({
                         onclick: (e) => removeTodo(todo),
@@ -120,7 +120,7 @@
                     },
                     edit: L.input({
                       _type: 'text',
-                      $value: todo.title,
+                      $value: todo.$title,
                       onkeydown: (e) => {
                         if (e.key == 'Enter') {
                           doneEdit(todo, e.target.value)
