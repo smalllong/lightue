@@ -21,7 +21,7 @@ function mapDom(value, el, elKey) {
         }
         setter ? setter(wel, v, updateDom) : (wel[elKey] = v)
       },
-      el ? new WeakRef(el) : null
+      el ? (window.WeakRef ? new WeakRef(el) : el) : null
     )
   } else setter ? setter(el, value) : (el[elKey] = value)
 }
@@ -139,7 +139,7 @@ Node.prototype._addChild = function (o, i, key) {
 
 export default Node
 
-var registry = new FinalizationRegistry((h) => {
+var registry = window.FinalizationRegistry && new FinalizationRegistry((h) => {
   h.set.delete(h.item)
 })
 export function useState(src) {
@@ -225,7 +225,7 @@ export function useState(src) {
       if (_dep) {
         deps[key].add(_dep[0])
         // GC dep with el
-        if (_dep[1])
+        if (_dep[1] && registry)
           registry.register(_dep[1], {
             set: deps[key],
             item: _dep[0],
@@ -276,7 +276,7 @@ export function useState(src) {
 // weakEl: a WeakRef for cleanup
 export function watchEffect(effect, cb, weakEl) {
   function runEffect(regather) {
-    var wel = weakEl?.deref()
+    var wel = weakEl?.deref ? weakEl.deref() : weakEl
     if (weakEl && !wel) return
     regather && (_dep = [runEffect, wel])
     _rendering = true

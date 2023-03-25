@@ -8,7 +8,9 @@
   "scripts": {
     "build-browser": "rollup src/lightue.js --format iife --name 'Lightue' --file dist/iife.js",
     "build-node": "rollup src/lightue.js --format cjs --file dist/cjs.js",
-    "build": "yarn build-browser && yarn build-node && terser dist/iife.js -c -m -o dist/lightue.min.js",
+    "build": "yarn build-browser && yarn build-node && yarn compat && yarn compress",
+    "compat": "yarn babel dist/iife.js -o dist/iife-compat.js",
+    "compress": "terser dist/iife.js -c -m -o dist/lightue.min.js && terser dist/iife-compat.js -c -m -o dist/lightue-compat.min.js",
     "docs:build": "node publish-doc.js",
     "docs": "cd docs && python -m http.server 3000",
     "test": "jest --env=jsdom"
@@ -20,6 +22,9 @@
   "author": "Xiaolong Li",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
     "director": "^1.2.8",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
@@ -29,6 +34,7 @@
   "files": [
     "src",
     "dist/cjs.js",
+    "dist/lightue-compat.min.js",
     "dist/lightue.min.js"
   ],
   "keywords": [
@@ -42,6 +48,6 @@
     "vdom"
   ],
   "browserslist": [
-    "firefox >= 79"
+    "firefox >= 29"
   ]
 }
