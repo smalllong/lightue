@@ -18,8 +18,9 @@ Try the live example [here](https://codepen.io/lxl898/pen/vYyooWK)
 
 ## Compatability
 
-Lightue supports all modern browsers except IE.
-To get legacy browser support, you can choose version 0.1.2 which supports down to IE 10.
+Lightue supports all modern browsers (2020+) except IE.
+If you need older browser support (2014+), you can choose lightue-compat.min.js instead of lightue.min.js.
+To get legacy browser support (2014-), you can choose version 0.1.2 which supports down to IE 10.
 
 ## TodoMVC
 
