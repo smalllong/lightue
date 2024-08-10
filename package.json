@@ -1,11 +1,12 @@
 {
   "name": "lightue",
-  "version": "0.4.4",
+  "version": "1.0.0-beta-1",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
   "browser": "dist/cjs.js",
   "module": "src/lightue.js",
   "unpkg": "dist/lightue.min.js",
   "scripts": {
+    "dev": "rollup src/lightue.js --format iife --name 'Lightue' --file dist/iife.js -w",
     "build-browser": "rollup src/lightue.js --format iife --name 'Lightue' --file dist/iife.js",
     "build-node": "rollup src/lightue.js --format cjs --file dist/cjs.js",
     "build": "yarn build-browser && yarn build-node && yarn compat && yarn compress",
@@ -28,6 +29,8 @@
     "director": "^1.2.8",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
+    "rollup": "^4.20.0",
+    "terser": "^5.31.5",
     "todomvc-app-css": "^2.4.2",
     "todomvc-common": "^1.0.5"
   },

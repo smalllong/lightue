@@ -12,29 +12,29 @@ html, body {
   height: 100%;
 }
 
-.select-demo {
+.selectDemo {
   float: left;
   width: 200px;
 }
 
-.select-demo-item {
+.selectDemo > label {
   display: block;
   border: 2px solid green;
   margin: 8px;
   overflow: auto;
 }
-.select-demo-item.current {
+.selectDemo > label.current {
   background-color: #bfb;
   box-shadow: 0 0 8px green;
 }
 
-.demos-ground {
+.demosGround {
   margin-left: 200px;
   position: relative;
   height: 100%;
 }
 
-.demos-ground-item {
+.demosGround > div {
   height: 100%;
   overflow: auto;
 }
@@ -44,7 +44,7 @@ button {
   padding: 1rem;
 }
 
-.week-title {
+.weekTitle {
   background-color: rgba(192, 192, 192, 0.7);
   position: absolute;
   top: 0;
@@ -54,13 +54,13 @@ button {
   padding: 0 16px;
 }
 
-.week-title-item, .days-item {
+.weekTitle > div, .days > div {
   display: inline-block;
   text-align: center;
   width: 14.28%;
 }
 
-.week-title-item > .end {
+.weekTitle > div > .end {
   color: #0088ff;
 }
 
@@ -68,22 +68,22 @@ button {
   padding: 40px 16px;
 }
 
-.months-item > .name {
+.monthsItem > .name {
   font-size: 24px;
   padding: 12px 16px;
   text-align: right;
 }
 
-.deep-blue {
+.deepBlue {
   background-color: #16b;
   color: #fff
 }
 
-.light-blue {
+.lightBlue {
   background-color: #2ad
 }
 
-.selected-text {
+.selectedText {
   background-color: rgba(192, 192, 192, 0.7);
   position: absolute;
   bottom: 0;
@@ -92,13 +92,13 @@ button {
   text-align: center;
 }
 
-.new-title {
+.newTitle {
   background-color: #bfb;
 }
 
-.demo-form-item {
+.demoForm > * {
   display: block;
 }
-.demo-form > .result {
+.demoForm > .result {
   word-break: break-all;
 }
