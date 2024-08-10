@@ -1,8 +1,12 @@
-import { isObj, isPrimitive } from './utils'
-import Node, { useState, watchEffect } from './Node'
+import Node, { useState, watchEffect } from './Node1'
 
-function Lightue(data, op) {
-  var vm = new Node(data, 'root', 'root', document.querySelector(op?.el || 'body'))
+// Main app, it's just a fragment auto mount to body
+function Lightue(props, ...rawChildren) {
+  var vm = new Node('', props, ...rawChildren)
+  var el = document.querySelector(props?.$el || 'body')
+  el.innerHTML = ''
+  el.appendChild(vm.el)
+  vm.el = el
   vm.el.querySelector('[autofocus]')?.focus()
   return vm
 }
@@ -53,48 +57,41 @@ Lightue.for = function (count, generateItem) {
 }
 ;(function () {
   var htmlTags = [
+    'fragment',
     'div',
     'span',
+    'strong',
     'form',
     'label',
     'input',
     'select',
     'option',
+    'textarea',
     'img',
     'button',
     'table',
+    'thead',
+    'tbody',
     'tr',
+    'th',
     'td',
     'a',
+    'b',
+    'nav',
     'ul',
     'li',
     'section',
     'header',
+    'main',
     'footer',
     'p',
   ]
   for (var i in htmlTags) {
     var o = htmlTags[i]
     Lightue[o] = (function (o) {
+      if (o == 'fragment') o = ''
       function getTagClassWrapper(className) {
-        return function (data) {
-          var tmp = {
-            $tag: o,
-          }
-          if (className) {
-            tmp.$class = {}
-            tmp.$class[className] = 1
-          }
-          if (isPrimitive(data) || Array.isArray(data)) {
-            tmp.$$ = data
-            return tmp
-          } else if (isObj(data)) {
-            data.$tag = o
-            if (isObj(data.$class) && tmp.$class) Object.assign(data.$class, tmp.$class)
-            else if (tmp.$class) data.$class = tmp.$class
-            return data
-          } else if (data == null || typeof data == 'undefined') return tmp
-        }
+        return (...args) => new Node(o + (className ? '.' + className : ''), ...args)
       }
       return new Proxy(getTagClassWrapper(), {
         get: function (src, key) {
