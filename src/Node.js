@@ -27,121 +27,58 @@ function mapDom(value, el, elKey) {
 }
 
 // VDOM Node
-// ndataKey: original key in VDomSrc
-// key: a className to be added
-// appendToEl: append new el to it
-// ndataValue: a cache to avoid rerun of ndata
-// originalEl: if passed, new el will replace this el in situ
-function Node(ndata, ndataKey, key, appendToEl, ndataValue, originalEl) {
-  ndataKey = String(ndataKey)
-  this.key = key || ''
-
-  var genNode = (ndata, updateDom) => {
-    if (isPrimitive(ndata) || Array.isArray(ndata) || ndata == null) {
-      if (!this.el) {
-        // first time create
-        this.tag = ndataKey.slice(0, 2) == '$_' ? 'span' : 'div'
-        this.el = document.createElement(this.tag)
-        if (originalEl && originalEl.parentNode) {
-          originalEl.parentNode.insertBefore(this.el, originalEl)
-          safeRemove(originalEl)
-        } else appendToEl && appendToEl.appendChild(this.el)
-        originalEl = this.el
-        key && this.el.classList.add(key)
-        this.texts = {}
-        this.childArr = []
-        this.el.VNode = this
-        if (isPrimitive(ndata)) {
-          domUpdaters.createTexts(this, '$$', ndata)
-        } else if (Array.isArray(ndata)) {
-          this.arrStart = new Comment('arr start')
-          this.arrEnd = new Comment('arr end')
-          this.el.appendChild(this.arrStart)
-          this.el.appendChild(this.arrEnd)
-          this.arrUpdate = updateDom
-          domUpdaters.$$arr(this)(this.el, ndata)
-        }
-      } else {
-        // update
-        if (isPrimitive(ndata)) {
-          domUpdaters.texts('$$')(this.el, ndata)
-        } else if (Array.isArray(ndata)) {
-          domUpdaters.$$arr(this)(this.el, ndata)
-        }
-      }
-      return
-    }
-    this.tag = (ndata && ndata.$tag) || (ndataKey.slice(0, 2) == '$_' ? 'span' : 'div')
-    this.el = document.createElement(this.tag)
-    if (originalEl && originalEl.parentNode) {
-      originalEl.parentNode.insertBefore(this.el, originalEl)
-      safeRemove(originalEl)
-    } else appendToEl && appendToEl.appendChild(this.el)
-    originalEl = this.el
-    key && this.el.classList.add(key)
-    this.texts = {}
-    this.childArr = []
-    this.el.VNode = this
-    for (var i in ndata) {
-      let o = ndata[i]
-      // skip handle null and undefined, but for boolean properties, treat them falsy
-      if (i != '$if' && i != '$checked' && o == null) continue
-      if (i[0] == '$') {
-        //lightue directives
-        if (i.slice(0, 2) == '$$') {
-          var _depStashed = _dep
-          _dep = null // avoid gather deps when getting oValue
-          var oValue = typeof o == 'function' ? o() : o
-          _dep = _depStashed
-          if (i == '$$' && Array.isArray(oValue)) {
-            this.arrStart = new Comment('arr start')
-            this.arrEnd = new Comment('arr end')
-            this.el.appendChild(this.arrStart)
-            this.el.appendChild(this.arrEnd)
-            this.arrUpdate = mapDom(o, this.el, domUpdaters.$$arr(this))
-          } else if (isObj(oValue)) {
-            this._addChild(o, i)
-          } else if (isPrimitive(oValue)) {
-            domUpdaters.createTexts(this, i, oValue)
-            mapDom(o, this.el, domUpdaters.texts(i))
-          }
-        } else if (i.slice(0, 2) == '$_') {
-          //span element shortcut
-          this._addChild(o, i, hyphenate(i.slice(2)))
-        } else if (i == '$if') {
-          // conditionally switch between elem and its placeholder
-          let bo = typeof o == 'function' ? () => Boolean(o()) : Boolean(o)
-          mapDom(bo, this.el, domUpdaters.$if(key))
-        } else if (i == '$class') {
-          Object.keys(o).forEach((j) => {
-            mapDom(o[j], this.el, domUpdaters.$class(hyphenate(j)))
-          })
-        } else if (i == '$value' && ['input', 'textarea', 'select'].indexOf(this.tag) > -1) mapDom(o, this.el, 'value')
-        else if (i == '$checked' && this.tag == 'input') mapDom(o, this.el, 'checked')
-        else if (i == '$cleanup') this.cleanup = o
-      } else if (i[0] == '_') {
-        mapDom(o, this.el, domUpdaters._(hyphenate(i.slice(1))))
-      } else if (i.slice(0, 2) == 'on') this.el.addEventListener(i.slice(2), o)
-      else this._addChild(o, i, hyphenate(i))
-    }
+// key: key of this node in VDomSrc, such as 'div.root'
+// props: object containing attributes and Lightue directives
+// rawChildren: raw child nodes in VDomSrc
+export default function Node(key, props, ...rawChildren) {
+  if (isPrimitive(props) || props instanceof Node || typeof props == 'function' || Array.isArray(props)) {
+    rawChildren.unshift(props)
+    props = null
   }
 
-  if (typeof ndata == 'function') {
-    mapDom(ndata, null, (el, v, updateDom) => {
-      genNode(v, updateDom)
+  var keyParts = key.split('.')
+  this.tag = keyParts[0]
+  this.el = this.tag ? document.createElement(this.tag) : document.createDocumentFragment()
+  if (keyParts.length > 1) {
+    keyParts.forEach((part, i) => {
+      i > 0 && this.el.classList.add(part)
     })
-  } else genNode(ndata)
+  }
+  this.el.VNode = this
+  for (var i in props) {
+    let o = props[i]
+    // skip handle null and undefined, but for boolean properties, treat them falsy
+    if (i != '$if' && i != '$checked' && o == null) continue
+    if (i[0] == '$') {
+      //lightue directives
+      if (i == '$if') {
+        // conditionally switch between elem and its placeholder
+        let bo = typeof o == 'function' ? () => Boolean(o()) : Boolean(o)
+        mapDom(bo, this.el, domUpdaters.$if(key))
+      } else if (i == '$class') {
+        Object.keys(o).forEach((j) => {
+          mapDom(o[j], this.el, domUpdaters.$class(j))
+        })
+      } else if (i == '$value' && ['input', 'textarea', 'select'].indexOf(this.tag) > -1) mapDom(o, this.el, 'value')
+      else if (i == '$checked' && this.tag == 'input') mapDom(o, this.el, 'checked')
+      else if (i == '$cleanup') this.cleanup = o
+    } else if (i.slice(0, 2) == 'on') this.el.addEventListener(i.slice(2), o)
+    else mapDom(o, this.el, domUpdaters._(hyphenate(i)))
+  }
+  // for remove previous nodes
+  this.lastNodes = []
+  this.childArr = []
+  // todo: support dynamic list in children
+  for (var i in rawChildren) {
+    mapDom(rawChildren[i], this.el, domUpdaters.child(i))
+  }
 }
 
-Node.prototype._addChild = function (o, i, key) {
-  new Node(o, i, key, this.el)
-}
-
-export default Node
-
-var registry = window.FinalizationRegistry && new FinalizationRegistry((h) => {
-  h.set.delete(h.item)
-})
+var registry =
+  window.FinalizationRegistry &&
+  new FinalizationRegistry((h) => {
+    h.set.delete(h.item)
+  })
 export function useState(src) {
   if (!isObj(src) || src._ls) return src
   var deps = {},
@@ -149,7 +86,7 @@ export function useState(src) {
     depNodes = []
   return new Proxy(src, {
     get: function (src, key) {
-      if (key == '_ls') return true
+      if (key == '_ls') return true // marks this is a lightue state object
       if (key == '_target') return src
       if (key == '_deps') return deps
       if (key == '_depNodes') return depNodes
@@ -185,7 +122,7 @@ export function useState(src) {
       if (src[key] != null && !src.hasOwnProperty(key)) {
         // prototype methods or array's length, reimplement or return src's
         if (Array.isArray(src)) {
-          // reimplement splice
+          // reimplement splice, to sync dom with array state
           if (key == 'splice')
             return (index, remove, ...insert) => {
               var oldLength = src.length
@@ -205,9 +142,8 @@ export function useState(src) {
                   var v = cb(subStates[curIndex] || item, curIndex)
                   _rendering = false
                   _dep = null
-                  var newNode = new Node(v, curIndex, node.key + '-item')
-                  newElsFragment.appendChild(newNode.el)
-                  return newNode
+                  newElsFragment.appendChild(v.el)
+                  return v
                 })
                 node.el.insertBefore(newElsFragment, node.childArr[index + remove]?.el || node.arrEnd)
                 node.childArr.splice(index, remove, ...newNodes)

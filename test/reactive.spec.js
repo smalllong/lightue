@@ -17,35 +17,35 @@ describe('reactive', () => {
     expect(vm.el.children[0].textContent).toBe('aaa')
   })
 
-  // it('array state changed', () => {
-  //   var S = L.useState({
-  //       list: [2, 3, 5, 7],
-  //     }),
-  //     renderCount = 0
+  it('array state changed', () => {
+    var S = L.useState({
+        list: [2, 3, 5, 7],
+      }),
+      renderCount = 0
 
-  //   var vm = L({
-  //     list: () => {
-  //       renderCount++
-  //       return S.list
-  //     },
-  //   })
+    var vm = L(
+      div.list(() => {
+        renderCount++
+        return S.list.map((num) => div(num))
+      })
+    )
 
-  //   expect(vm.el.children[0].children.length).toBe(4)
-  //   expect(vm.el.textContent).toBe('2357')
-  //   expect(renderCount).toBe(1)
-  //   S.list.push(11)
-  //   expect(vm.el.children[0].children.length).toBe(5)
-  //   expect(vm.el.textContent).toBe('235711')
-  //   expect(renderCount).toBe(1)
-  //   S.list[2] = 432
-  //   expect(vm.el.children[0].children.length).toBe(5)
-  //   expect(vm.el.textContent).toBe('23432711')
-  //   expect(renderCount).toBe(1)
-  //   S.list = [999, 888, 777]
-  //   expect(vm.el.children[0].children.length).toBe(3)
-  //   expect(vm.el.textContent).toBe('999888777')
-  //   expect(renderCount).toBe(2)
-  // })
+    expect(vm.el.children[0].children.length).toBe(4)
+    expect(vm.el.textContent).toBe('2357')
+    expect(renderCount).toBe(1)
+    S.list.push(11)
+    expect(vm.el.children[0].children.length).toBe(5)
+    expect(vm.el.textContent).toBe('235711')
+    expect(renderCount).toBe(1)
+    S.list[2] = 432
+    expect(vm.el.children[0].children.length).toBe(5)
+    expect(vm.el.textContent).toBe('23432711')
+    expect(renderCount).toBe(1)
+    S.list = [999, 888, 777]
+    expect(vm.el.children[0].children.length).toBe(3)
+    expect(vm.el.textContent).toBe('999888777')
+    expect(renderCount).toBe(2)
+  })
 
   // it('multiple array mapped VDomSrc changed', () => {
   //   var S = L.useState({
