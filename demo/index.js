@@ -101,13 +101,13 @@ function DemoDateRangeSelect() {
       div('Saterday', span.end('*'))
     ),
     div.months(
-      ...L.for(13, function (i) {
+      L.for(13, function (i) {
         var month = new Date(y, m + i),
           monthLength = new Date(y, m + i + 1, 0).getDate()
         return div(
           div.name(month.getFullYear() + '/' + (month.getMonth() + 1)),
           div.days(
-            ...L.for(month.getDay()).concat(
+            L.for(month.getDay(), () => div()).concat(
               L.for(monthLength, function (j) {
                 var d = new Date(y, m + i, j + 1)
                 return div(
@@ -184,7 +184,7 @@ function DemoList() {
     S.newTitle = !S.newTitle
     if (S.action == 'push') {
       S.action = 'splice'
-      S.list.splice(2, 2, 1)
+      S.list.splice(2, 2, 'spliced item')
     } else if (S.action == 'change') {
       S.action = 'push'
       S.list.push(Math.random())

@@ -10,11 +10,11 @@ A lightweight and simple web frontend model-view framework inspired by Vue.js
 ## Highlights
 
 - Super lightweight (<2.5KB min+br)
-- State driven dom updates
-- JS functional style template, great editor support in JS context
+- State driven automatic dom updates
+- JS functional style template, great native editor support
 - Flexible function style components
 - Low overhead, easily setup and run
 
-## Document has been moved to https://lightue.netlify.app/ or https://lightue.vercel.app/
+## Document has been moved to https://lightue.netlify.app/ or https://lightue.pages.dev/
 
 If you have any advices or concerns, you can leave an issue :-)

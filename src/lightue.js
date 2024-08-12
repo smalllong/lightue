@@ -1,4 +1,4 @@
-import Node, { useState, watchEffect } from './Node1'
+import Node, { useState, watchEffect } from './Node'
 
 // Main app, it's just a fragment auto mount to body
 function Lightue(props, ...rawChildren) {
@@ -82,6 +82,12 @@ Lightue.for = function (count, generateItem) {
     'li',
     'section',
     'header',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
     'main',
     'footer',
     'p',
