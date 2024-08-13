@@ -1,11 +1,16 @@
-var L = Lightue,
-  { div, span, label, input, form, textarea, select, option } = L
-var S = L.useState({
+import Lightue, {
+  loop,
+  useState,
+  useProp,
+} from '../dist/lightue.min.js'
+
+var { div, span, label, input, form, textarea, select, option, button } = Lightue
+var S = useState({
   curDemo: 0,
 })
 
 function DemoComp() {
-  var S = L.useState({
+  var S = useState({
     aaa: 123,
     bbb: {
       ccc: '345',
@@ -13,10 +18,10 @@ function DemoComp() {
   })
 
   function Btn(props, onclick) {
-    var P = L.useProp(props)
+    var P = useProp(props)
     return div(
       div.desc(() => 'component received param text: ' + P.text),
-      L.button.btn(
+      button.btn(
         {
           _type: 'button',
           onclick,
@@ -44,7 +49,7 @@ function DemoComp() {
 }
 
 function DemoGrowingRect() {
-  var S = Lightue.useState({
+  var S = useState({
     width: 20,
     height: 30,
   })
@@ -70,7 +75,7 @@ function DemoGrowingRect() {
 }
 
 function DemoDateRangeSelect() {
-  var S = L.useState({
+  var S = useState({
     selectStart: null,
     selectEnd: null,
   })
@@ -101,14 +106,14 @@ function DemoDateRangeSelect() {
       div('Saterday', span.end('*'))
     ),
     div.months(
-      L.for(13, function (i) {
+      loop(13, function (i) {
         var month = new Date(y, m + i),
           monthLength = new Date(y, m + i + 1, 0).getDate()
         return div(
           div.name(month.getFullYear() + '/' + (month.getMonth() + 1)),
           div.days(
-            L.for(month.getDay(), () => div()).concat(
-              L.for(monthLength, function (j) {
+            loop(month.getDay(), () => div()).concat(
+              loop(monthLength, function (j) {
                 var d = new Date(y, m + i, j + 1)
                 return div(
                   {
@@ -133,7 +138,7 @@ function DemoDateRangeSelect() {
 }
 
 function DemoSimplifyRatio() {
-  var S = L.useState({
+  var S = useState({
     w: '1',
     h: '1',
   })
@@ -172,7 +177,7 @@ function DemoSimplifyRatio() {
 }
 
 function DemoList() {
-  var S = L.useState({
+  var S = useState({
       list: [],
       action: 'change',
       newTitle: false,
@@ -216,7 +221,7 @@ function DemoList() {
 }
 
 function DemoForm() {
-  var S = L.useState({
+  var S = useState({
     formData: {
       name: 'ABC',
       description: "I'm new to Lightue!\nHow about you?",
@@ -274,7 +279,7 @@ function DemoRadio(index, name, checked) {
 
 var demos = [DemoComp, DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio, DemoList, DemoForm]
 
-var vm = L(
+Lightue(
   div.selectDemo(
     ...demos.map(function (demo, i) {
       return DemoRadio(i, demo.name, i == 0)
