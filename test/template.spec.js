@@ -1,5 +1,5 @@
-var L = require('../dist/cjs'),
-  { div, span, section, input } = L
+import Lightue, { useState } from '../dist/lightue'
+var { div, span, section, input } = L = Lightue
 
 describe('template', () => {
   it('create root element', () => {
@@ -81,7 +81,7 @@ describe('template', () => {
 
   it('$cleanup', () => {
     var cleanup = jest.fn(),
-      S = L.useState({
+      S = useState({
         curComp: 0,
       })
     function comp1() {

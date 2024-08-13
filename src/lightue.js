@@ -1,7 +1,7 @@
 import Node, { useState, watchEffect } from './Node'
 
 // Main app, it's just a fragment auto mount to body
-function Lightue(props, ...rawChildren) {
+export default function Lightue(props, ...rawChildren) {
   var vm = new Node('', props, ...rawChildren)
   var el = document.querySelector(props?.$el || 'body')
   el.innerHTML = ''
@@ -11,30 +11,21 @@ function Lightue(props, ...rawChildren) {
   return vm
 }
 
-// user can abort dependent update by setting _abortDep to true and the set it back to false
-// Lightue._abortDep = false
-
-Lightue.useState = function (src) {
-  return useState(src)
-}
-
-Lightue.watchEffect = watchEffect
-
 // turn prop function to prop state
-Lightue.useProp = function (props) {
-  var S = Lightue.useState({})
-  Lightue.watchEffect(() => {
+export function useProp(props) {
+  var S = useState({})
+  watchEffect(() => {
     var p = props()
     for (var i in p) S[i] = p[i]
   })
   return S
 }
 
-Lightue.useComp = function (func) {
+export function useComp(func) {
   function getComp(className) {
     // call comp
     return function (props, ...args) {
-      var tmp = func(Lightue.useProp(props), ...args)
+      var tmp = func(useProp(props), ...args)
       if (className) {
         if (!tmp.$class) tmp.$class = {}
         tmp.$class[className] = 1
@@ -49,12 +40,12 @@ Lightue.useComp = function (func) {
   })
 }
 
-//methods
-Lightue.for = function (count, generateItem) {
+export function loop(count, generateItem) {
   var arr = []
   for (var i = 0; i < count; i++) arr.push(generateItem ? generateItem(i) : '')
   return arr
 }
+
 ;(function () {
   var htmlTags = [
     'fragment',
@@ -108,4 +99,4 @@ Lightue.for = function (count, generateItem) {
   }
 })()
 
-export default Lightue
+export { useState, watchEffect }

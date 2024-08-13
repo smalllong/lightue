@@ -1,8 +1,9 @@
-var L = require('../dist/cjs'), {div} = L
+import Lightue, { useState } from '../dist/lightue'
+var { div } = L = Lightue
 
 describe('reactive', () => {
   it('state changed', () => {
-    var S = L.useState({
+    var S = useState({
       foo: 'bar',
       width: 20,
     })
@@ -18,7 +19,7 @@ describe('reactive', () => {
   })
 
   it('array state changed', () => {
-    var S = L.useState({
+    var S = useState({
         list: [2, 3, 5, 7],
       }),
       renderCount = 0
