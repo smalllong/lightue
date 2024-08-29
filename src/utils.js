@@ -15,7 +15,7 @@ export function moveArr(arr, from, to) {
   arr.splice(to, 0, itemArr[0])
 }
 
-export function safeRemove(el) {
-  el?.VNode?.cleanup?.()
-  el?.remove()
+export function safeRemove(node) {
+  node?.cleanup?.()
+  node?.currentEl?.remove()
 }

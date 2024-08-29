@@ -74,6 +74,36 @@ exports[`template create root element 1`] = `
 </body>
 `;
 
+exports[`template multiple array 1`] = `
+<body>
+  <div
+    class="root"
+  >
+    <div>
+      1
+    </div>
+    <div>
+      2
+    </div>
+    <div>
+      3
+    </div>
+    <div>
+      4
+    </div>
+    <div>
+      5
+    </div>
+    <div>
+      6
+    </div>
+    <div>
+      7
+    </div>
+  </div>
+</body>
+`;
+
 exports[`template not create null or undefined 1`] = `
 <body>
   <div
@@ -84,8 +114,8 @@ exports[`template not create null or undefined 1`] = `
 
 exports[`template not show $if 1`] = `
 <body>
-  <!--div.foo-->
-  <!--div.undefined-->
+  <!---->
+  <!---->
   <div
     class="aaa"
   >

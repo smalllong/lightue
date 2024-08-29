@@ -32,7 +32,17 @@ describe('template', () => {
   })
 
   it('simple array', () => {
-    L(div.root(...[1, 2, 3, 4].map((n) => div(n))))
+    L(div.root([1, 2, 3, 4].map((n) => div(n))))
+    expect(document.body).toMatchSnapshot()
+  })
+
+  it('multiple array', () => {
+    L(
+      div.root(
+        [1, 2, 3, 4].map((n) => div(n)),
+        [5, 6, 7].map((n) => div(n))
+      )
+    )
     expect(document.body).toMatchSnapshot()
   })
 
