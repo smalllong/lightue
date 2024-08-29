@@ -22,7 +22,6 @@ If you have any advices or concerns, you can leave an issue :-)
 ## How to release a new version
 
 - change to new version number in package.json
-- `bun publish-doc.js`
 - `bun dist`
 - commit the change (potentially together with other changes)
 - `git tag -a ${new version number}`, add release description

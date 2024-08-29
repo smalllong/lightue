@@ -1,6 +1,6 @@
 {
   "name": "lightue",
-  "version": "1.0.0-beta-1",
+  "version": "1.0.0-beta-2",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
   "browser": "dist/lightue.min.js",
   "type": "module",
@@ -26,6 +26,9 @@
     "jest-environment-jsdom": "^28.1.0",
     "todomvc-app-css": "^2.4.2",
     "todomvc-common": "^1.0.5"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
   },
   "files": [
     "dist/lightue.min.js"

@@ -281,7 +281,7 @@ var demos = [DemoComp, DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio, 
 
 Lightue(
   div.selectDemo(
-    ...demos.map(function (demo, i) {
+    demos.map(function (demo, i) {
       return DemoRadio(i, demo.name, i == 0)
     })
   ),

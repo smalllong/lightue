@@ -1,15 +1,17 @@
 // this file contains methods that actually do the dom updating for various parts in VDomSrc
 
+import ListNode from './ListNode'
 import Node from './Node'
 import { isPrimitive, safeRemove } from './utils'
 
-export default {
+const domUpdaters = {
   $class: (j) => (el, v) => el.classList[v ? 'add' : 'remove'](j),
-  $if: (key) => (el, v) => {
+  // conditionally switch between elem and its placeholder
+  $if: (el, v) => {
     var node = el.VNode
     // stop handling detached el
     if (el != node.el) return
-    if (!node.placeholder) node.placeholder = new Comment(key)
+    if (!node.placeholder) node.placeholder = new Comment()
     if (v && node.isStashed) {
       node.placeholder.parentNode?.insertBefore(el, node.placeholder)
       node.placeholder.remove()
@@ -21,47 +23,39 @@ export default {
     }
   },
   _: (attr) => (el, v) => v != null && v !== false ? el.setAttribute(attr, v) : el.removeAttribute(attr),
+  item: (el, c, childNodes, i, arrEnd) => {
+    let newNode = wrapNode(c)
+    if (childNodes[i]) {
+      el.insertBefore(newNode.currentEl, childNodes[i].currentEl)
+      safeRemove(childNodes[i])
+    } else {
+      el.insertBefore(newNode.currentEl, arrEnd)
+    }
+    childNodes[i] = newNode
+  },
   child: (i) => (el, c) => {
     var node = el.VNode
-    // remove last render
-    if (Array.isArray(c)) {
-      node.childArr.forEach((n) => safeRemove(n.el))
+    if (c instanceof ListNode) {
+      const newList = c.mount(node, node[i]?.arrStart)
+      node[i]?.unmount(node)
+      node[i] = newList
+    } else if (Array.isArray(c)) {
+      c.forEach(item => {
+        el.appendChild(wrapNode(item).currentEl)
+      })
     } else {
-      safeRemove(node.lastNodes[i]?.el)
-      safeRemove(node.lastNodes[i]?.placeholder)
-    }
-
-    if (c == null) return
-
-    // render and append
-    if (Array.isArray(c)) {
-      // initialize array el placeholder
-      if (!node.arrStart) {
-        node.arrStart = new Comment('arr start')
-        node.arrEnd = new Comment('arr end')
-        el.appendChild(node.arrStart)
-        el.appendChild(node.arrEnd)
-      }
-      var tempFragment = document.createDocumentFragment()
-      if (c._ls) c._depNodes.push([node, c, (a) => a])
-      if (c._mappedFrom) c._mappedFrom[0].push([node, ...c._mappedFrom.slice(1)])
-      node.childArr = c.map(wrapNode)
-      node.childArr.forEach((n) => appendNode(tempFragment, n))
-      el.insertBefore(tempFragment, node.arrEnd)
-    } else {
+      safeRemove(node.lastNodes[i])
+      if (c == null) return
       node.lastNodes[i] = wrapNode(c)
-      appendNode(el, node.lastNodes[i])
+      el.appendChild(node.lastNodes[i].currentEl)
     }
   },
 }
 
 // wrap any child into a real or fake Node
 function wrapNode(value) {
-  if (isPrimitive(value)) return { el: document.createTextNode(value) }
+  if (isPrimitive(value)) return { currentEl: document.createTextNode(value) }
   else if (value instanceof Node) return value
 }
 
-// append child node's el to parent node's el, no matter the child is stashed or not
-function appendNode(el, node) {
-  el.appendChild(node.isStashed ? node.placeholder : node.el)
-}
+export default domUpdaters

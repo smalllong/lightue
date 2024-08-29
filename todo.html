@@ -5,13 +5,12 @@
     <title>Lightue • TodoMVC</title>
     <link rel="stylesheet" href="node_modules/todomvc-common/base.css" />
     <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css" />
-    <link rel="modulepreload" href="./dist/lightue.min.js" />
   </head>
   <body>
     <script src="node_modules/todomvc-common/base.js"></script>
     <script src="node_modules/director/build/director.js"></script>
     <script type="module">
-      import Lightue, { useState, watchEffect } from '../dist/lightue.min.js'
+      import Lightue, { useState, watchEffect } from './dist/lightue.min.js'
       var { div, span, section, header, input, h1, label, ul, li, footer, a, button, p } = Lightue,
         STORAGE_KEY = 'todos-lightue',
         S = useState({

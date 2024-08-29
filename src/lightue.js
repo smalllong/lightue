@@ -1,4 +1,5 @@
-import Node, { useState, watchEffect } from './Node'
+import Node from './Node'
+import { useState, watchEffect } from './useState'
 
 // Main app, it's just a fragment auto mount to body
 export default function Lightue(props, ...rawChildren) {
@@ -7,6 +8,7 @@ export default function Lightue(props, ...rawChildren) {
   el.innerHTML = ''
   el.appendChild(vm.el)
   vm.el = el
+  vm.el.VNode = vm
   vm.el.querySelector('[autofocus]')?.focus()
   return vm
 }
@@ -27,14 +29,13 @@ export function useComp(func) {
     return function (props, ...args) {
       var tmp = func(useProp(props), ...args)
       if (className) {
-        if (!tmp.$class) tmp.$class = {}
-        tmp.$class[className] = 1
+        tmp.el.classList.add(className)
       }
       return tmp
     }
   }
   return new Proxy(getComp(), {
-    get: function (src, key) {
+    get: function (_src, key) {
       return getComp(key)
     },
   })
@@ -99,4 +100,4 @@ export function loop(count, generateItem) {
   }
 })()
 
-export { useState, watchEffect }
+export { useState, watchEffect, Node }
