@@ -1,147 +1,364 @@
-var L = Lightue
-var S = L.useState({
-  curDemo: 0
-})
+var {
+  useState,
+  useProp,
+  loop,
+  div,
+  span,
+  label,
+  input,
+  form,
+  textarea,
+  select,
+  option,
+  button,
+} = Lightue;
+var S = useState({
+  curDemo: 0,
+});
+
+function DemoComp() {
+  var S = useState({
+    aaa: 123,
+    bbb: {
+      ccc: "345",
+    },
+  });
+
+  function Btn(props, onclick) {
+    var P = useProp(props, "text");
+    return div(
+      div(".desc", () => "component received param text: " + P.text),
+      button(
+        ".btn",
+        {
+          type: "button",
+          onclick,
+        },
+        P.$text
+      )
+    );
+  }
+
+  return div(
+    div(
+      ".states",
+      "parent states:",
+      div(".aaa", () => "aaa: " + S.aaa),
+      div(".bbbccc", () => "bbb.ccc: " + S.bbb.ccc)
+    ),
+    Btn(
+      () => ({ text: S.aaa }),
+      () => (S.aaa += 4)
+    ),
+    Btn(
+      () => ({ text: S.bbb.ccc }),
+      () => (S.bbb.ccc += 5)
+    )
+  );
+}
 
 function DemoGrowingRect() {
-  var S = Lightue.useState({
+  var S = useState({
     width: 20,
-    height: 30
-  })
-  setInterval(function() {
-    S.width ++
-  }, 500)
-  setInterval(function() {
-      S.height ++
-  }, 800)
-  return {
-      $$: 'width and height are: ',
-      result: () => S.width + ':' + S.height,
-      rect: {
-          _style: () => 'background-color: green; width: '+S.width+'px; height: '+S.height+'px',
-      }
-  }
+    height: 30,
+  });
+  var growWidth = setInterval(function () {
+    S.width++;
+  }, 500);
+  var growHeight = setInterval(function () {
+    S.height++;
+  }, 800);
+  return div(
+    {
+      $cleanup: () => {
+        clearInterval(growWidth);
+        clearInterval(growHeight);
+      },
+    },
+    "width and height are: ",
+    div(".result", () => S.width + ":" + S.height),
+    div(".rect", {
+      style: () =>
+        "background-color: green; width: " +
+        S.width +
+        "px; height: " +
+        S.height +
+        "px",
+    })
+  );
 }
 
 function DemoDateRangeSelect() {
-  var S = L.useState({
-    selectStart: null, 
+  var S = useState({
+    selectStart: null,
     selectEnd: null,
-  })
-  function select(e, date) {
+  });
+  function select(date) {
     if (S.selectStart && S.selectStart < date && S.selectEnd == null)
-      S.selectEnd = date
+      S.selectEnd = date;
     else {
-      S.selectStart = date
-      S.selectEnd = null
+      S.selectStart = date;
+      S.selectEnd = null;
     }
   }
   function dateEquals(d1, d2) {
-    if (d1 == null || d2 == null) return false
-    return d1.getTime() == d2.getTime()
+    if (d1 == null || d2 == null) return false;
+    return d1.getTime() == d2.getTime();
   }
 
-  var today = new Date(), y = today.getFullYear(), m = today.getMonth()
+  var today = new Date(),
+    y = today.getFullYear(),
+    m = today.getMonth();
 
-  return {
-    weekTitle: [{$$: 'Sunday', $_end: '*'}, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', {$$: 'Saterday', $_end: '*'}],
-    months: L.for(13, function(i) {
-      var month = new Date(y, m+i), monthLength = new Date(y, m+i+1, 0).getDate()
-      return {
-        name: month.getFullYear()+'/'+(month.getMonth()+1),
-        days: L.for(month.getDay()).concat(L.for(monthLength, function(j) {
-          var d = new Date(y, m+i, j+1)
-          return {
-            $class: {
-              deepBlue: () => dateEquals(d, S.selectStart) || S.selectEnd && dateEquals(d, S.selectEnd),
-              lightBlue: () => d > S.selectStart && S.selectEnd && d < S.selectEnd
-            },
-            $$: j+1,
-            onclick: [select, d],
-          }
-        })),
-      }
-    }),
-    selectedText: {
-      $class: {hidden: () => S.selectEnd == null},
-      $$: () => S.selectEnd == null ? '' : S.selectStart.toLocaleDateString() + '~' + S.selectEnd.toLocaleDateString(),
-    },
-  }
+  return div(
+    div(
+      ".weekTitle",
+      div("Sunday", span(".end", "*")),
+      div("Monday"),
+      div("Tuesday"),
+      div("Wednesday"),
+      div("Thursday"),
+      div("Friday"),
+      div("Saterday", span(".end", "*"))
+    ),
+    div(
+      ".months",
+      loop(13, function (i) {
+        var month = new Date(y, m + i),
+          monthLength = new Date(y, m + i + 1, 0).getDate();
+        return div(
+          div(".name", month.getFullYear() + "/" + (month.getMonth() + 1)),
+          div(
+            ".days",
+            loop(month.getDay(), () => div()).concat(
+              loop(monthLength, function (j) {
+                var d = new Date(y, m + i, j + 1);
+                return div(
+                  {
+                    $class: {
+                      deepBlue: () =>
+                        dateEquals(d, S.selectStart) ||
+                        (S.selectEnd && dateEquals(d, S.selectEnd)),
+                      lightBlue: () =>
+                        d > S.selectStart && S.selectEnd && d < S.selectEnd,
+                    },
+                    onclick: (e) => select(d),
+                  },
+                  j + 1
+                );
+              })
+            )
+          )
+        );
+      })
+    ),
+    div(
+      ".selectedText",
+      { $class: { hidden: () => S.selectEnd == null } },
+      () =>
+        S.selectEnd == null
+          ? ""
+          : S.selectStart.toLocaleDateString() +
+            "~" +
+            S.selectEnd.toLocaleDateString()
+    )
+  );
 }
 
 function DemoSimplifyRatio() {
-  var vm = {
-    inputs: {
-      width: L.input({
-        _type: 'number',
-        oninput: showRatio,
+  var S = useState({
+    w: "1",
+    h: "1",
+  });
+  return div(
+    div(
+      ".inputs",
+      input(".width", {
+        type: "number",
+        value: () => S.w,
+        oninput: (e) => (S.w = e.target.value),
       }),
-      $$: ':',
-      height: L.input({
-        _type: 'number',
-        oninput: showRatio,
-      }),
-    },
-    result: {
-      label: 'the ratio simplified is:',
-      content: '',
-    }
-  }
-  return vm
-  
-  function getGCD(a, b) { // greatest common divider
-    if (a == '' || b == '') return null
-    if (a == b) return a
+      ":",
+      input(".height", {
+        type: "number",
+        value: () => S.h,
+        oninput: (e) => (S.h = e.target.value),
+      })
+    ),
+    div(
+      ".result",
+      div(".label", "the ratio simplified is:"),
+      div(".content", () => calcRatio(S.w, S.h))
+    )
+  );
+
+  // greatest common divider
+  function getGCD(a, b) {
+    if (a == "" || b == "") return null;
+    if (a == b) return a;
     if (a < b) {
-      var c = a
-      a = b
-      b = c
+      var c = a;
+      a = b;
+      b = c;
     }
-    var r = a % b
-    if (r == 0) return b
-    else if (r == 1) return 1
-    else return getGCD(b, r)
+    var r = a % b;
+    if (r == 0) return b;
+    else if (r == 1) return 1;
+    else return getGCD(b, r);
   }
-  
+
   function calcRatio(a, b) {
-    var gcd = getGCD(a, b)
-    if (gcd) return a/gcd + ':' + b/gcd
-    else return ''
+    var gcd = getGCD(a, b);
+    if (gcd) return a / gcd + ":" + b / gcd;
+    else return "";
   }
-  
-  function showRatio() {
-    vm.result.content = calcRatio(vm.inputs.width.$value, vm.inputs.height.$value)
-  }
+}
+
+function DemoList() {
+  var S = useState({
+      list: [],
+      action: "change",
+      newTitle: false,
+      count: 0,
+    }),
+    count = 0;
+  var changeList = () => {
+    count++;
+    S.newTitle = !S.newTitle;
+    if (S.action == "push") {
+      S.action = "splice";
+      S.list.splice(2, 2, "spliced item");
+    } else if (S.action == "change") {
+      S.action = "push";
+      S.list.push(Math.random());
+    } else {
+      var temp = [];
+      for (var i = 0; i < count; i++) {
+        temp.push(Math.random());
+      }
+      S.list = temp;
+      S.action = "change";
+    }
+  };
+  return div(
+    div(
+      ".title",
+      {
+        $class: { newTitle: () => S.newTitle },
+      },
+      div(
+        ".content",
+        () => "List " + S.action + "d",
+        button({ onclick: changeList }, "Change List")
+      )
+    ),
+    div(
+      ".theList",
+      div(
+        ".beforeList",
+        () => "The list starts with length: " + S.list._length
+      ),
+      () => S.list.map((num) => div(".randomNum", num)),
+      div(".afterList", "The list ends")
+    )
+  );
+}
+
+function DemoForm() {
+  var S = useState({
+    formData: {
+      name: "ABC",
+      description: "I'm new to Lightue!\nHow about you?",
+      workDone: true,
+      group: "groupA",
+    },
+  });
+  return form(
+    ".demoForm",
+    label(
+      "name: ",
+      input({
+        type: "text",
+        $value: () => S.formData.name,
+        oninput: (e) => (S.formData.name = e.target.value),
+      })
+    ),
+    label(
+      "description: ",
+      textarea({
+        $value: () => S.formData.description,
+        oninput: (e) => (S.formData.description = e.target.value),
+      })
+    ),
+    label(
+      "work done? ",
+      input({
+        type: "checkbox",
+        $checked: () => S.formData.workDone,
+        onchange: (e) => (S.formData.workDone = e.target.checked),
+      })
+    ),
+    label(
+      "group: ",
+      select(
+        {
+          $value: () => S.formData.group,
+          onchange: (e) => (S.formData.group = e.target.value),
+        },
+        ...["", "groupA", "groupB", "groupC", "groupD"].map((op) =>
+          option(
+            {
+              value: op,
+            },
+            op
+          )
+        )
+      )
+    ),
+    div(".result", () => JSON.stringify(S.formData))
+  );
 }
 
 function showDemo(e) {
-  S.curDemo = this.value
+  S.curDemo = this.value;
 }
 
 function DemoRadio(index, name, checked) {
-  return L.label({
-    $class: {
-      current: () => S.curDemo == index
+  return label(
+    {
+      $class: {
+        current: () => S.curDemo == index,
+      },
     },
-    $$: L.input({
-      _type: 'radio',
-      _name: 'demo',
-      _value: index,
-      _checked: checked ? 'checked' : null,
+    input(".demoRadio", {
+      type: "radio",
+      name: "demo",
+      value: index,
+      checked: checked ? "checked" : null,
       onchange: showDemo,
     }),
-    $$t: name
-  })
+    name
+  );
 }
 
-var demos = [DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio]
+var demos = [
+  DemoComp,
+  DemoGrowingRect,
+  DemoDateRangeSelect,
+  DemoSimplifyRatio,
+  DemoList,
+  DemoForm,
+];
 
-var vm = L({
-  selectDemo: demos.map(function(demo, i) {return DemoRadio(i, demo.name, i==0)}),
-  demosGround: demos.map(function(demo, i) {
-    return {
-      _style: () => S.curDemo == i ? '' : 'display: none',
-      $$: demo()
-    }
-  })
-})
+Lightue(
+  div(
+    ".selectDemo",
+    demos.map(function (demo, i) {
+      return DemoRadio(i, demo.name, i == 0);
+    })
+  ),
+  div(
+    ".demosGround",
+    div(() => demos[S.curDemo]())
+  )
+);

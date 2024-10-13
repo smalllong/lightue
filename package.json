@@ -2,9 +2,11 @@
   "name": "lightue",
   "version": "0.1.2",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
-  "main": "lightue.js",
+  "module": "src/lightue.js",
+  "unpkg": "dist/lightue.min.js",
   "scripts": {
-    "compress": "node compress.js",
+    "build": "rollup src/lightue.js --format iife --name 'Lightue' --file dist/lightue.min.js",
+    "dev": "rollup src/lightue.js --format iife --name 'Lightue' --file dist/lightue.min.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,10 +16,15 @@
   "author": "Xiaolong Li",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.21.2",
     "terser": "^4.6.3"
   },
   "browserslist": [
-    "firefox >= 9",
-    "ie >= 10"
+    "firefox >= 13",
+    "ie >= 11"
   ]
 }
