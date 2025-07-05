@@ -12,8 +12,9 @@ Lightue 是一个启发自Vue.js的轻量简单的web前端框架
 
 - 超级轻量 (<2.5KB min+br)
 - 状态驱动dom更新
-- JS对象式模板，良好的编辑器原生js支持
+- JS函数式模板，良好的编辑器原生js支持
 - 灵活的函数式组件
+- 配合CoffeeScript使代码简洁, 查看示例: demo/index.coffee
 - 低开销，轻松搭建和运行
 
 ## 兼容性

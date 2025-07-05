@@ -14,6 +14,7 @@ Try the live example [here](https://codepen.io/lxl898/pen/vYyooWK)
 - State driven dom updates
 - JS object style template, great editor support in JS context
 - Flexible function style components
+- Concise code used together with CoffeeScript, see example demo/index.coffee
 - Low overhead, easily setup and run
 
 ## Compatability
