@@ -1,12 +1,13 @@
 {
   "name": "lightue",
-  "version": "1.0.0-beta-2",
+  "version": "1.0.0",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
   "browser": "dist/lightue.min.js",
   "type": "module",
   "scripts": {
     "dev": "bun build ./src/lightue.js --outfile ./dist/lightue.js --watch",
-    "dist": "bun build ./src/lightue.js --outfile ./dist/lightue.min.js --minify",
+    "dist": "bun build ./src/lightue.js --outfile ./dist/lightue.min.js --minify --format=iife",
+    "demo": "coffee -b -c -w demo/index.coffee",
     "docs:build": "node publish-doc.js",
     "docs": "cd docs && python -m http.server 3000",
     "test": "jest --env=jsdom"

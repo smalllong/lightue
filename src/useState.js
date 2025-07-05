@@ -1,4 +1,3 @@
-import Lightue from './lightue'
 import ListNode from './ListNode'
 import { isObj, moveArr } from './utils'
 
@@ -107,12 +106,10 @@ export function useState(src) {
           } else delete subStates[key]
         }
       }
-      if (!Lightue._abortDep) {
-        deps[key] && deps[key].forEach((dep) => dep(regather))
-        if (isArr) {
-          key = Number(key)
-          !isNaN(key) && key >= 0 && this.get(src, 'splice')(key, 1, value)
-        }
+      deps[key] && deps[key].forEach((dep) => dep(regather))
+      if (isArr) {
+        key = Number(key)
+        !isNaN(key) && key >= 0 && this.get(src, 'splice')(key, 1, value)
       }
       return true
     },

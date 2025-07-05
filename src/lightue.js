@@ -2,7 +2,7 @@ import Node from './Node'
 import { useState, watchEffect } from './useState'
 
 // Main app, it's just a fragment auto mount to body
-export default function Lightue(props, ...rawChildren) {
+function Lightue(props, ...rawChildren) {
   var vm = new Node('', props, ...rawChildren)
   var el = document.querySelector(props?.$el || 'body')
   el.innerHTML = ''
@@ -14,7 +14,7 @@ export default function Lightue(props, ...rawChildren) {
 }
 
 // turn prop function to prop state
-export function useProp(props) {
+function useProp(props) {
   var S = useState({})
   watchEffect(() => {
     var p = props()
@@ -23,7 +23,7 @@ export function useProp(props) {
   return S
 }
 
-export function useComp(func) {
+function useComp(func) {
   function getComp(className) {
     // call comp
     return function (props, ...args) {
@@ -39,12 +39,6 @@ export function useComp(func) {
       return getComp(key)
     },
   })
-}
-
-export function loop(count, generateItem) {
-  var arr = []
-  for (var i = 0; i < count; i++) arr.push(generateItem ? generateItem(i) : '')
-  return arr
 }
 
 ;(function () {
@@ -83,10 +77,12 @@ export function loop(count, generateItem) {
     'main',
     'footer',
     'p',
+    'video',
+    'audio',
   ]
   for (var i in htmlTags) {
     var o = htmlTags[i]
-    Lightue[o] = (function (o) {
+    window[o] = (function (o) {
       if (o == 'fragment') o = ''
       function getTagClassWrapper(className) {
         return (...args) => new Node(o + (className ? '.' + className : ''), ...args)
@@ -100,4 +96,9 @@ export function loop(count, generateItem) {
   }
 })()
 
-export { useState, watchEffect, Node }
+window.L = Lightue
+window.useState = useState
+window.watchEffect = watchEffect
+window.useProp = useProp
+window.useComp = useComp
+window.Node = Node

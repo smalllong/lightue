@@ -1,7 +1,3 @@
-import Lightue, { useState, useProp } from '../dist/lightue.min.js'
-
-{ div, span, label, input, form, textarea, select, option, button } = Lightue
-
 SGlobal = useState
   curDemo: 0
 
@@ -21,10 +17,8 @@ DemoComp = =>
         P.$text
 
   div {},
-    div.states {},
-      'parent states:'
-      div.aaa => "aaa: #{S.aaa}"
-      div.bbbccc => "bbb.ccc: #{S.bbb.ccc}"
+    div.states 'parent states:',
+      div style: 'margin-left: 20px', => JSON.stringify S
     Btn (-> {text: S.aaa}),
       -> S.aaa += 4
     Btn (-> {text: S.bbb.ccc}),
@@ -244,7 +238,7 @@ DemoRadio = (index, name, checked) =>
 
 demos = [DemoComp, DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio, DemoList, DemoForm]
 
-Lightue(
+L(
   div.selectDemo {},
     demos.map (demo, i) =>
       DemoRadio i, demo.name, i == 0
