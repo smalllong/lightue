@@ -47,7 +47,11 @@ const domUpdaters = {
       safeRemove(node.lastNodes[i])
       if (c == null) return
       node.lastNodes[i] = wrapNode(c)
-      el.appendChild(node.lastNodes[i].currentEl)
+      if (node.lastNodes[i + 1]) {
+        el.insertBefore(node.lastNodes[i].currentEl, node.lastNodes[i + 1].currentEl)
+      } else {
+        el.appendChild(node.lastNodes[i].currentEl)
+      }
     }
   },
 }

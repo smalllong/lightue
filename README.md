@@ -17,4 +17,11 @@ A lightweight and simple web frontend model-view framework inspired by Vue.js
 
 ## Document has been moved to https://lightue.netlify.app/ or https://lightue.pages.dev/
 
+## Live example
+<iframe height="640" style="width: 100%;" scrolling="no" title="Getting Started" src="https://codepen.io/lxl898/embed/gOvvOPy?default-tab=js%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href="https://codepen.io/lxl898/pen/gOvvOPy">
+  Getting Started</a> by lxl (<a href="https://codepen.io/lxl898">@lxl898</a>)
+  on <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
 If you have any advices or concerns, you can leave an issue :-)

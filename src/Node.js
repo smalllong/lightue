@@ -44,7 +44,7 @@ export default function Node(key, props, ...rawChildren) {
   this.lastNodes = []
   // todo: support dynamic list in children
   for (var i in rawChildren) {
-    this.bindDom(rawChildren[i], domUpdaters.child(i))
+    this.bindDom(rawChildren[i], domUpdaters.child(Number(i)))
   }
 }
 

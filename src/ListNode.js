@@ -30,7 +30,7 @@ ListNode.prototype.unmount = function (parentNode) {
 ListNode.prototype.bindItemDom = function (item, i) {
   watchEffect(
     () => this.renderItem(item, i),
-    (finalValue) => domUpdaters.item(this.parentNode.el, finalValue, this.childNodes, i, this.arrEnd),
+    (finalValue) => this.parentNode && domUpdaters.item(this.parentNode.el, finalValue, this.childNodes, i, this.arrEnd),
     this.parentNode.el
   )
 }
