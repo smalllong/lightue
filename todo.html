@@ -9,11 +9,11 @@
   <body>
     <script src="node_modules/todomvc-common/base.js"></script>
     <script src="node_modules/director/build/director.js"></script>
-    <script src="dist/lightue.min.js"></script>
-    <script>
-      var L = Lightue,
+    <script type="module">
+      import Lightue, { useState, watchEffect } from './dist/lightue.min.js'
+      var { div, span, section, header, input, h1, label, ul, li, footer, a, button, p } = Lightue,
         STORAGE_KEY = 'todos-lightue',
-        S = L.useState({
+        S = useState({
           todos: JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'),
           editedTodo: null,
           visibility: '',
@@ -33,7 +33,7 @@
       })
       router.init()
 
-      L.watchEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(S.todos)))
+      watchEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(S.todos)))
 
       function removeTodo(todo) {
         S.todos = S.todos.filter((t) => t != todo)
@@ -51,16 +51,13 @@
         return count + ' item' + (count == 1 ? '' : 's') + ' left'
       }
 
-      L({
-        todoapp: L.section({
-          header: L.header({
-            $$: {
-              $tag: 'h1',
-              $$: 'todos',
-            },
-            newTodo: L.input({
-              _placeholder: 'What needs to be done?',
-              _autofocus: 'autofocus',
+      Lightue(
+        section.todoapp(
+          header.header(
+            h1('todos'),
+            input['new-todo']({
+              placeholder: 'What needs to be done?',
+              autofocus: 'autofocus',
               onkeydown: (e) => {
                 var newTodo = e.target.value.trim()
                 if (e.key == 'Enter' && newTodo) {
@@ -72,94 +69,101 @@
                   e.target.value = ''
                 }
               },
-            }),
-          }),
-          main: L.section({
-            _hidden: () => S.todos.length == 0,
-            toggleAll: L.input({
-              _id: 'toggle-all',
-              _type: 'checkbox',
+            })
+          ),
+          section.main(
+            { hidden: () => S.todos.length == 0 },
+            input['toggle-all']({
+              id: 'toggle-all',
+              type: 'checkbox',
               $checked: () => S.todos.filter((todo) => !todo.completed).length == 0,
               onchange: (e) => {
                 var checked = e.target.checked
                 S.todos.forEach((todo) => (todo.completed = checked))
               },
             }),
-            $$: L.label({
-              _for: 'toggle-all',
-              $$: 'Mark all as complete',
-            }),
-            todoList: L.ul({
-              $$: () =>
-                S.todos.map((todo) =>
-                  L.li.todo({
-                    $if: () => S.visibility == '' || S.visibility == 'active' && !todo.completed || S.visibility == 'completed' && todo.completed,
+            label({ for: 'toggle-all' }, 'Mark all as complete'),
+            ul['todo-list'](() =>
+              S.todos.map((todo) =>
+                li.todo(
+                  {
+                    $if: () =>
+                      S.visibility == '' ||
+                      (S.visibility == 'active' && !todo.completed) ||
+                      (S.visibility == 'completed' && todo.completed),
                     $class: {
                       completed: () => todo.completed,
                       editing: () => todo == S.editedTodo,
                     },
-                    view: {
-                      toggle: L.input({
-                        _type: 'checkbox',
-                        $checked: () => todo.completed,
-                        onchange: (e) => {
-                          todo.completed = e.target.checked
-                        },
-                      }),
-                      todoLabel: L.label({
+                  },
+                  div.view(
+                    input.toggle({
+                      type: 'checkbox',
+                      $checked: () => todo.completed,
+                      onchange: (e) => {
+                        todo.completed = e.target.checked
+                      },
+                    }),
+                    label['todo-label'](
+                      {
                         ondblclick: (e) => {
                           beforeEditCache = todo.title
                           S.editedTodo = todo
                           e.target.parentElement.nextElementSibling.focus()
                         },
-                        $$: todo.$title,
-                      }),
-                      destroy: L.button({
-                        onclick: (e) => removeTodo(todo),
-                      }),
-                    },
-                    edit: L.input({
-                      _type: 'text',
-                      $value: todo.$title,
-                      onkeydown: (e) => {
-                        if (e.key == 'Enter') {
-                          doneEdit(todo, e.target.value)
-                        } else if (e.key == 'Escape') {
-                          S.editedTodo = null
-                          todo.title = beforeEditCache
-                        }
                       },
-                      onblur: (e) => doneEdit(todo, e.target.value),
-                    }),
+                      todo.$title
+                    ),
+                    button.destroy({
+                      onclick: (e) => removeTodo(todo),
+                    })
+                  ),
+                  input.edit({
+                    type: 'text',
+                    $value: todo.$title,
+                    onkeydown: (e) => {
+                      if (e.key == 'Enter') {
+                        doneEdit(todo, e.target.value)
+                      } else if (e.key == 'Escape') {
+                        S.editedTodo = null
+                        todo.title = beforeEditCache
+                      }
+                    },
+                    onblur: (e) => doneEdit(todo, e.target.value),
                   })
-                ),
-            }),
-          }),
-          footer: L.footer({
-            _hidden: () => S.todos.length == 0,
-            $_todoCount: () => getRemainingString(S.todos.filter((todo) => !todo.completed).length),
-            filters: L.ul(
+                )
+              )
+            )
+          ),
+          footer.footer(
+            { hidden: () => S.todos.length == 0 },
+            span['todo-count'](() => getRemainingString(S.todos.filter((todo) => !todo.completed).length)),
+            ul.filters(
               routes.map((route) =>
-                L.li({
-                  $$: L.a({
-                    _href: '#/' + route[0],
-                    $class: { selected: () => S.visibility == route[0] },
-                    $$: route[1],
-                  }),
-                })
+                li(
+                  a(
+                    {
+                      href: '#/' + route[0],
+                      $class: { selected: () => S.visibility == route[0] },
+                    },
+                    route[1]
+                  )
+                )
               )
             ),
-            clearCompleted: L.button({
-              onclick: (e) => {
-                S.todos = S.todos.filter((todo) => !todo.completed)
+            button['clear-completed'](
+              {
+                onclick: (e) => {
+                  S.todos = S.todos.filter((todo) => !todo.completed)
+                },
+                hidden: () => S.todos.filter((todo) => todo.completed).length == 0,
               },
-              _hidden: () => S.todos.filter((todo) => todo.completed).length == 0,
-              $$: 'Clear completed',
-            }),
-          }),
-        }),
-        info: L.footer([L.p('Double-click to edit a todo'), L.p('Created by Smalllong'), L.p('Part of TodoMVC')]),
-      })
+              'Clear completed'
+            )
+          )
+        ),
+        footer.info(p('Double-click to edit a todo'), p('Created by Smalllong'), p('Part of TodoMVC'))
+      )
     </script>
   </body>
 </html>

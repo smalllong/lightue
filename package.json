@@ -1,16 +1,13 @@
 {
   "name": "lightue",
-  "version": "0.4.4",
+  "version": "1.0.0",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
-  "browser": "dist/cjs.js",
-  "module": "src/lightue.js",
-  "unpkg": "dist/lightue.min.js",
+  "browser": "dist/lightue.min.js",
+  "type": "module",
   "scripts": {
-    "build-browser": "rollup src/lightue.js --format iife --name 'Lightue' --file dist/iife.js",
-    "build-node": "rollup src/lightue.js --format cjs --file dist/cjs.js",
-    "build": "yarn build-browser && yarn build-node && yarn compat && yarn compress",
-    "compat": "yarn babel dist/iife.js -o dist/iife-compat.js",
-    "compress": "terser dist/iife.js -c -m -o dist/lightue.min.js && terser dist/iife-compat.js -c -m -o dist/lightue-compat.min.js",
+    "dev": "bun build ./src/lightue.js --outfile ./dist/lightue.js --watch",
+    "dist": "bun build ./src/lightue.js --outfile ./dist/lightue.min.js --minify --format=iife",
+    "demo": "coffee -b -c -w demo/index.coffee",
     "docs:build": "node publish-doc.js",
     "docs": "cd docs && python -m http.server 3000",
     "test": "jest --env=jsdom"
@@ -31,10 +28,10 @@
     "todomvc-app-css": "^2.4.2",
     "todomvc-common": "^1.0.5"
   },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
   "files": [
-    "src",
-    "dist/cjs.js",
-    "dist/lightue-compat.min.js",
     "dist/lightue.min.js"
   ],
   "keywords": [

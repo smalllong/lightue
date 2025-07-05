@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -6,9 +7,9 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <script src="../dist/iife.js"></script>
-    <script>
-      var L = Lightue
+    <script type="module">
+      import Lightue, { loop, useState } from '../dist/lightue.js'
+      const L = Lightue, {div} = L
     </script>
   </body>
 </html>

@@ -2,7 +2,7 @@
 
 <a href="https://npmjs.com/package/lightue"><img src="https://img.shields.io/npm/v/lightue.svg" alt="npm-v"></a>&nbsp;
 <a href="https://npmjs.com/package/lightue"><img src="https://img.shields.io/npm/dt/lightue.svg" alt="npm-d"></a>&nbsp;
-<a href="https://bundlephobia.com/result?p=lightue"><img src="https://img.badgesize.io/https:/unpkg.com/lightue/dist/lightue.min.js?label=brotli&compression=brotli" alt="brotli"></a>
+<a href="https://deno.bundlejs.com/?q=lightue&config=%7B%22compression%22%3A%22brotli%22%7D"><img src="https://deno.bundlejs.com/?q=lightue&badge&config=%7B%22compression%22%3A%22brotli%22%7D" alt="brotli"></a>
 
 Lightue is a lightweight and simple web frontend model-view framework inspired by Vue.js
 
