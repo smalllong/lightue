@@ -16,7 +16,7 @@ You're ready to go
 
 To test Lightue with the demo, run:
 ```
-bun dist -w
+bun dist
 bun demo
 ```
 Now you're ready to preview the demo/index.html with any server of your choise (suggest Live Server in VSCode).

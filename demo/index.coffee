@@ -237,11 +237,12 @@ DemoRadio = (index, name, checked) =>
     name
 
 demos = [DemoComp, DemoGrowingRect, DemoDateRangeSelect, DemoSimplifyRatio, DemoList, DemoForm]
+demosNames = ['DemoComp', 'DemoGrowingRect', 'DemoDateRangeSelect', 'DemoSimplifyRatio', 'DemoList', 'DemoForm']
 
 L(
   div.selectDemo {},
     demos.map (demo, i) =>
-      DemoRadio i, demo.name, i == 0
+      DemoRadio i, demosNames[i], i == 0
   div.demosGround {},
     div => demos[SGlobal.curDemo]()
 )

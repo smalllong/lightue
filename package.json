@@ -1,12 +1,13 @@
 {
   "name": "lightue",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
   "browser": "dist/lightue.min.js",
   "type": "module",
   "scripts": {
     "dev": "bun build ./src/lightue.js --outfile ./dist/lightue.js --watch",
-    "dist": "bun build ./src/lightue.js --outfile ./dist/lightue.min.js --minify --format=iife",
+    "dist": "bun build ./src/lightue.js --outfile ./dist/lightue.min.js --minify --format=iife && bun run compat",
+    "compat": "babel dist/lightue.min.js -o dist/lightue-compat.min.js && terser dist/lightue-compat.min.js -o dist/lightue-compat.min.js",
     "demo": "coffee -b -c -w demo/index.coffee",
     "docs:build": "node publish-doc.js",
     "docs": "cd docs && python -m http.server 3000",
@@ -25,6 +26,7 @@
     "director": "^1.2.8",
     "jest": "^28.1.0",
     "jest-environment-jsdom": "^28.1.0",
+    "terser": "^5.43.1",
     "todomvc-app-css": "^2.4.2",
     "todomvc-common": "^1.0.5"
   },
