@@ -1,6 +1,6 @@
 {
   "name": "lightue",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A lightweight and simple model-view framework inspired by Vue.js",
   "browser": "dist/lightue.min.js",
   "type": "module",
@@ -34,7 +34,8 @@
     "bun": ">=1.0.0"
   },
   "files": [
-    "dist/lightue.min.js"
+    "dist/lightue.min.js",
+    "dist/lightue-compat.min.js"
   ],
   "keywords": [
     "lightue",
